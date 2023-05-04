@@ -1,0 +1,8 @@
+.history/
+.vs/
+.vscode/
+.DS_Store
+dist/
+node_modules/
+secrets.js
+__azurite*
