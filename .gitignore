@@ -1,3 +1,13 @@
+# deployments
+output/
+*.zip
+
+# terraform
+.terraform/
+*.lock.hcl
+*.tfstate
+*.tfvars
+
 .history/
 .vs/
 .vscode/
