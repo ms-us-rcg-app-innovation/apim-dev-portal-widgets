@@ -1,64 +1,83 @@
 <style src="../../styles/app.scss"></style>
 
 <template>
-  <p>Custom widget!</p>
-  <p>This custom widget will be used to build a Product 2</p>
-  <!-- <form v-if="defaultEmail != null" :action="actionUrl" method="post" target="_blank"
-        class="flex-columns-container height-fill">
-    <div class="form-group">
-      <label for="email" class="form-label">{{ label1 }}</label>
-      <input id="email" type="email" class="form-control" name="email" placeholder="example@contoso.com"
-             v-model="defaultEmail" />
+  <div v-if="true" class="flex-columns-container height-fill">
+    <div class="form-inline max-w-500">
+      <p>Select a product to view APIs</p>
+      <!-- <input type="search" class="form-control form-control-light" aria-label="Search" placeholder="Search products" spellcheck="false"
+            data-bind="textInput: pattern" /> -->
     </div>
-    <div class="form-group height-fill flex-columns-container">
-      <label for="message" class="form-label">{{ label2 }}</label>
-      <textarea id="message" class="form-control flex-grow" name="message" :placeholder="placeholder"></textarea>
+
+    <div class="cards">
+      <!-- ko if: working -->
+      <!-- <div class="cards-body">
+            <spinner class="fit"></spinner>
+        </div> -->
+      <!-- /ko -->
+
+      <div class="cards-body animation-fade-in">
+
+        <a v-if="products.length > 0" v-for="product in products" href="#">
+          <div class="card item-tile">
+            <h3>
+              <span>{{ product.title }}</span>
+            </h3>
+            <div class="tile line-clamp">
+              <p class="tile-content" v-html="product.description"></p>
+            </div>
+          </div>
+        </a>
+        <p v-else>No products found</p>
+      </div>
+      <div class="cards-footer" v-if="!working && totalPages > 1">
+        <!-- <pagination params="{ pageNumber: $component.pageNumber, totalPages: $component.totalPages }"></pagination> -->
+      </div>
     </div>
-    <div class="form-group">
-      <button type="submit" class="button button-primary">Submit</button>
-    </div>
-  </form>
-  <div v-else class="loading"></div> -->
+  </div>
+  <div v-else class="loading"></div>
 </template>
 
 <script lang="ts">
-import {getValues} from "@azure/api-management-custom-widgets-tools"
-import {valuesDefault} from "../../values"
+import { getValues } from "@azure/api-management-custom-widgets-tools"
+import { valuesDefault } from "../../values"
 
 export default {
   data() {
     return {
-      label1: null,
-      label2: null,
-      placeholder: null,
-      actionUrl: null,
-      defaultEmail: null,
+      products: [
+        {
+          id: 1,
+          title: "product 1",
+          description: "<p>here's a <b>description</b><p>"
+        },
+        {
+          id: 2,
+          title: "product 2",
+          description: "<p>here's another <u>description</u><p>"
+        },
+        {
+          id: 3,
+          title: "product 3",
+          description: "<p>and again, another <i>description</i><p>"
+        }
+      ],
+      working: false,
+      pattern: "",
+      pageNumber: 1,
+      totalPages: 0
     }
   },
 
   inject: ["secretsPromise", "requestPromise"],
 
   async mounted(): Promise<void> {
-    const editorData = getValues(valuesDefault)
-    this.label1 = editorData.label1
-    this.label2 = editorData.label2
-    this.placeholder = editorData.placeholder
-    this.actionUrl = editorData.actionUrl
+    const editorData = getValues(valuesDefault);
 
-    const [secrets, request] = await Promise.all([this.secretsPromise, this.requestPromise])
+    const [secrets, request] = await Promise.all([this.secretsPromise, this.requestPromise]);
 
     if (!secrets.userId) {
-      this.defaultEmail = ""
-      return
+      return;
     }
-
-    request(`/users/${secrets.userId}`)
-      .then(e => e.json())
-      .then(({properties}) => this.defaultEmail = properties.email)
-      .catch(e => {
-        console.error("Could not prefill the email address!", e)
-        this.defaultEmail = ""
-      })
-  },
+  }
 }
 </script>
