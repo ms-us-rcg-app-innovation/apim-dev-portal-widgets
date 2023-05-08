@@ -16,7 +16,7 @@
       </div>
       <div class="cards-body animation-fade-in" v-else>
         <h4>Products</h4>
-        <a v-if="products.length > 0" v-for="product in products" href="#" v-on:click="selectedProduct = product">
+        <a v-if="products.length > 0" v-for="product in products" href="#" v-on:click="loadApis(product)">
           <div class="card item-tile">
             <h3>
               <span>{{ product.displayName }}</span>
@@ -37,18 +37,27 @@
 
       <div class="cards-body animation-fade-in">
         <h4>{{ selectedProduct.displayName }} APIs</h4>
-        <a href="#" v-on:click="selectedProduct = null">Back to Products</a>
-        <!-- <a v-if="products.length > 0" v-for="product in products" href="#">
-          <div class="card item-tile">
-            <h3>
-              <span>{{ product.title }}</span>
-            </h3>
-            <div class="tile line-clamp">
-              <p class="tile-content" v-html="product.description"></p>
-            </div>
-          </div>
-        </a>
-        <p v-else>No products found</p> -->
+        <ul v-if="apis.length">
+          <li v-for="api in apis">
+            <input type="checkbox" v-model="api.selected" /> {{ api.name }}
+          </li>
+        </ul>
+        <a href="#" v-on:click="addSelectedApis()">Add to My APIs</a><br/>
+        <a href="#" v-on:click="clearProduct()">Back to Products</a>
+      </div>
+    </div>
+
+    <div class="cards" >
+      <p>My APIs</p>
+      <div v-if="selectedApis.length">
+        <ul v-if="selectedApis.length">
+          <li v-for="(api, index) in selectedApis">
+            {{ api.name }}&nbsp;<a href="#" v-on:click="removeSelectedApi(index)">Remove</a>
+          </li>
+        </ul>
+      </div>
+      <div v-else>
+        <p>No APIs selected.</p>
       </div>
     </div>
   </div>
@@ -61,6 +70,7 @@
 import { getValues } from "@azure/api-management-custom-widgets-tools"
 import { valuesDefault } from "../../values"
 import { Product } from "../../models/product";
+import { Api } from "../../models/api";
 
 export default {
   data() {
@@ -82,6 +92,8 @@ export default {
           description: "<p>and again, another <i>description</i><p>"
         }
       ] as Product[],
+      apis: [] as Api[],
+      selectedApis: [] as Api[],
       working: false,
       pattern: "",
       pageNumber: 1,
@@ -93,13 +105,61 @@ export default {
   inject: ["secretsPromise", "requestPromise"],
 
   async mounted(): Promise<void> {
-    const editorData = getValues(valuesDefault);
+    // const editorData = getValues(valuesDefault);
 
-    const [secrets, request] = await Promise.all([this.secretsPromise, this.requestPromise]);
+    // const [secrets, request] = await Promise.all([this.secretsPromise, this.requestPromise]);
 
-    if (!secrets.userId) {
-      return;
+    // if (!secrets.userId) {
+    //   return;
+    // }
+  },
+
+  computed:{
+
+  },
+
+  methods: {
+    loadApis(product: Product) {
+      const dummyAPIs = [{
+        id: "1",
+        name: "API 1",
+      },
+      {
+        id: "2",
+        name: "API 2",
+      },
+      {
+        id: "3",
+        name: "API 3",
+      },
+      {
+        id: "4",
+        name: "API 4",
+      },] as Api[]
+
+      this.selectedProduct = product;
+      this.apis = dummyAPIs;
+    },
+    clearProduct() {
+      this.selectedProduct = null;
+      this.apis = [];
+    },
+    addSelectedApis() {
+      var selectedApis = this.apis.filter(api => api.selected);
+
+      if (!selectedApis.length) {
+        return
+      }
+
+      for (let i = 0; i < selectedApis.length; i++) {
+        this.selectedApis.push(selectedApis[i])
+      }
+
+      this.clearProduct();
+    },
+    removeSelectedApi(index: number) {
+      this.selectedApis.splice(index, 1);
     }
-  }
+  },
 }
 </script>
