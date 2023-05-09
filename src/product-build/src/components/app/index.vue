@@ -15,8 +15,8 @@
         working...
       </div>
       <div class="cards-body animation-fade-in" v-else>
-        <h4>Products</h4>
-        <a v-if="products.length > 0" v-for="product in products" href="#" v-on:click="loadApis(product)">
+        <h2>Products</h2>
+        <a v-if="products.length > 0" v-for="product in products" href="#" v-on:click.prevent="loadApis(product)">
           <div class="card item-tile">
             <h3>
               <span>{{ product.displayName }}</span>
@@ -34,25 +34,38 @@
     </div>
 
     <div class="cards" v-if="selectedProduct != null">
-
-      <div class="cards-body animation-fade-in">
-        <h4>{{ selectedProduct.displayName }} APIs</h4>
-        <ul v-if="apis.length">
-          <li v-for="api in apis">
-            <input type="checkbox" v-model="api.selected" /> {{ api.name }}
-          </li>
-        </ul>
-        <a href="#" v-on:click="addSelectedApis()">Add to My APIs</a><br/>
-        <a href="#" v-on:click="clearProduct()">Back to Products</a>
+      <div class="cards-body" v-if="working">
+        <!-- <spinner class="fit"></spinner> -->
+        working...
+      </div>
+      <div class="cards-body animation-fade-in" v-else>
+        <h2>{{ selectedProduct.displayName }} APIs</h2>
+        <div v-if="apis.length > 0">
+          <a v-for="api in apis" href="#">
+            <div class="card item-tile">
+              <h3>
+                <span>{{ api.name }}</span>
+              </h3>
+              <div class="tile line-clamp">
+                <p class="tile-content" v-html="api.description"></p>
+                <p><a href="#" v-on:click.prevent="addApiToProduct(api)">Add to My Product</a></p>
+              </div>
+            </div>
+          </a>
+          <a href="#" v-on:click="clearProduct()">Back to Products</a>
+        </div>
+        <div v-else>
+          <p>No APIs found</p>
+        </div>
       </div>
     </div>
 
-    <div class="cards" >
+    <div class="cards">
       <p>My APIs</p>
       <div v-if="selectedApis.length">
         <ul v-if="selectedApis.length">
           <li v-for="(api, index) in selectedApis">
-            {{ api.name }}&nbsp;<a href="#" v-on:click="removeSelectedApi(index)">Remove</a>
+            {{ api.name }}&nbsp;<a href="#" v-on:click.prevent="removeSelectedApi(index)">Remove</a>
           </li>
         </ul>
       </div>
@@ -114,7 +127,7 @@ export default {
     // }
   },
 
-  computed:{
+  computed: {
 
   },
 
@@ -144,18 +157,8 @@ export default {
       this.selectedProduct = null;
       this.apis = [];
     },
-    addSelectedApis() {
-      var selectedApis = this.apis.filter(api => api.selected);
-
-      if (!selectedApis.length) {
-        return
-      }
-
-      for (let i = 0; i < selectedApis.length; i++) {
-        this.selectedApis.push(selectedApis[i])
-      }
-
-      this.clearProduct();
+    addApiToProduct(api: Api) {
+      this.selectedApis.push(api);
     },
     removeSelectedApi(index: number) {
       this.selectedApis.splice(index, 1);

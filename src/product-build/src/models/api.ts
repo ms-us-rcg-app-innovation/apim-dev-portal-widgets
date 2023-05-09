@@ -118,8 +118,6 @@ export class Api {
      */
     public termsOfServiceUrl?: string;
 
-    public selected: boolean = false;
-
     constructor(contract?: ApiContract) {
         if (contract?.id) {
             this.id = Utils.getResourceName("apis", contract.id, "shortId");

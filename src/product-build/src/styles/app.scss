@@ -1,7 +1,16 @@
 @import "reboot.scss";
+@import "card.scss";
 
 body {
   font-family: "Segoe UI", sans-serif;
+}
+
+h3 {
+  font-size: 22px;
+  font-style: normal;
+  margin-top: 40px;
+  font-weight: normal;
+  margin-bottom: 10px;
 }
 
 .form-label {
@@ -80,4 +89,22 @@ textarea {
     background: white;
     text-align: center;
   }
+}
+
+a {
+  color: #0078d4;
+  text-decoration: none;
+  background-color: rgba(0,0,0,0);
+}
+
+.line-clamp {
+  text-align: left;
+}
+
+p {
+  color: #000;
+  font-style: normal;
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }

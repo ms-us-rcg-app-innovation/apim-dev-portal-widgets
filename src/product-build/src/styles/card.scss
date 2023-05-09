@@ -1,0 +1,26 @@
+.card.item-tile {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.card {
+    border-top: none;
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.12549019607843137);
+    margin-top: 30px;
+    text-align: left;
+    border-left: none;
+    margin-left: 30px;
+    padding-top: 50px;
+    border-right: none;
+    margin-right: 30px;
+    padding-left: 30px;
+    border-bottom: none;
+    margin-bottom: 30px;
+    padding-right: 30px;
+    padding-bottom: 50px;
+}
+
+.card {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
