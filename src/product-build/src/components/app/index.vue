@@ -1,77 +1,88 @@
 <style src="../../styles/app.scss"></style>
 
 <template>
-  <div v-if="true" class="flex-columns-container height-fill">
+  <div v-if="true" class="height-fill">
     <div class="form-inline max-w-500">
       <p>Select a product to view APIs</p>
       <!-- <input type="search" class="form-control form-control-light" aria-label="Search" placeholder="Search products" spellcheck="false"
             data-bind="textInput: pattern" /> -->
     </div>
 
-    <div class="cards" v-if="selectedProduct == null">
+    <div style="clear:both"></div>
 
-      <div class="cards-body" v-if="working">
-        <!-- <spinner class="fit"></spinner> -->
-        working...
-      </div>
-      <div class="cards-body animation-fade-in" v-else>
-        <h2>Products</h2>
-        <a v-if="products.length > 0" v-for="product in products" href="#" v-on:click.prevent="loadApis(product)">
-          <div class="card item-tile">
-            <h3>
-              <span>{{ product.displayName }}</span>
-            </h3>
-            <div class="tile line-clamp">
-              <p class="tile-content" v-html="product.description"></p>
-            </div>
-          </div>
-        </a>
-        <p v-else>No products found</p>
-      </div>
-      <div class="cards-footer" v-if="!working && totalPages > 1">
-        <!-- <pagination params="{ pageNumber: $component.pageNumber, totalPages: $component.totalPages }"></pagination> -->
-      </div>
-    </div>
+    <div class="column">
+      <div class="cards" v-if="selectedProduct == null">
 
-    <div class="cards" v-if="selectedProduct != null">
-      <div class="cards-body" v-if="working">
-        <!-- <spinner class="fit"></spinner> -->
-        working...
-      </div>
-      <div class="cards-body animation-fade-in" v-else>
-        <h2>{{ selectedProduct.displayName }} APIs</h2>
-        <div v-if="apis.length > 0">
-          <a v-for="api in apis" href="#">
+        <div class="cards-body" v-if="working">
+          <!-- <spinner class="fit"></spinner> -->
+          working...
+        </div>
+        <div class="cards-body animation-fade-in" v-else>
+          <h2>Products</h2>
+          <a v-if="products.length > 0" v-for="product in products" href="#" v-on:click.prevent="loadApis(product)">
             <div class="card item-tile">
               <h3>
-                <span>{{ api.name }}</span>
+                <span>{{ product.displayName }}</span>
               </h3>
               <div class="tile line-clamp">
-                <p class="tile-content" v-html="api.description"></p>
-                <p><a href="#" v-on:click.prevent="addApiToProduct(api)">Add to My Product</a></p>
+                <p class="tile-content" v-html="product.description"></p>
               </div>
             </div>
           </a>
-          <a href="#" v-on:click="clearProduct()">Back to Products</a>
+          <p v-else>No products found</p>
         </div>
-        <div v-else>
-          <p>No APIs found</p>
+        <div class="cards-footer" v-if="!working && totalPages > 1">
+          <!-- <pagination params="{ pageNumber: $component.pageNumber, totalPages: $component.totalPages }"></pagination> -->
+        </div>
+      </div>
+
+      <div class="cards" v-if="selectedProduct != null">
+        <div class="cards-body" v-if="working">
+          <!-- <spinner class="fit"></spinner> -->
+          working...
+        </div>
+        <div class="cards-body animation-fade-in" v-else>
+          <h2>{{ selectedProduct.displayName }} APIs</h2>
+          <div v-if="apis.length > 0">
+            <div v-for="api in apis">
+              <div class="card item-tile">
+                <h3>
+                  <span>{{ api.name }}</span>
+                </h3>
+                <div class="tile line-clamp">
+                  <p class="tile-content" v-html="api.description"></p>
+                  <p><a href="#" v-on:click.prevent="addApiToProduct(api)" class="button">Add to My Product</a></p>
+                </div>
+              </div>
+            </div>
+            <div class="button-group-center">
+              <a href="#" v-on:click.prevent="clearProduct()" class="button">Back to Products</a>
+            </div>  
+          </div>
+          <div v-else>
+            <p>No APIs found</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="cards">
-      <p>My APIs</p>
-      <div v-if="selectedApis.length">
-        <ul v-if="selectedApis.length">
-          <li v-for="(api, index) in selectedApis">
-            {{ api.name }}&nbsp;<a href="#" v-on:click.prevent="removeSelectedApi(index)">Remove</a>
-          </li>
-        </ul>
-      </div>
-      <div v-else>
-        <p>No APIs selected.</p>
-      </div>
+    <div class="column">
+        <h2>My APIs</h2>
+        <div v-if="selectedApis.length">
+          <div v-for="(api, index) in selectedApis">
+              <div class="card item-tile">
+                <h3>
+                  <span>{{ api.name }}</span>
+                </h3>
+                <div class="tile line-clamp">
+                  <p><a href="#" v-on:click.prevent="removeSelectedApi(index)" class="button">Remove</a></p>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div v-else>
+          <p>No APIs selected.</p>
+        </div>
     </div>
   </div>
   <div v-else class="loading">
@@ -118,13 +129,7 @@ export default {
   inject: ["secretsPromise", "requestPromise"],
 
   async mounted(): Promise<void> {
-    // const editorData = getValues(valuesDefault);
 
-    // const [secrets, request] = await Promise.all([this.secretsPromise, this.requestPromise]);
-
-    // if (!secrets.userId) {
-    //   return;
-    // }
   },
 
   computed: {

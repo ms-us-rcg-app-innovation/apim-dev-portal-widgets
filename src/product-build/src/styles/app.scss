@@ -1,5 +1,6 @@
 @import "reboot.scss";
 @import "card.scss";
+@import "button.scss";
 
 body {
   font-family: "Segoe UI", sans-serif;
@@ -11,6 +12,10 @@ h3 {
   margin-top: 40px;
   font-weight: normal;
   margin-bottom: 10px;
+  
+  span {
+    color:#0078d4
+  }
 }
 
 .form-label {
@@ -94,7 +99,7 @@ textarea {
 a {
   color: #0078d4;
   text-decoration: none;
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .line-clamp {
@@ -107,4 +112,11 @@ p {
   font-weight: normal;
   margin-top: 0;
   margin-bottom: 1rem;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  display: block;
+  padding: 10px
 }
