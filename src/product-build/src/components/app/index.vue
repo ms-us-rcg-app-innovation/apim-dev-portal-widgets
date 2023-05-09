@@ -26,7 +26,7 @@
               <div class="tile line-clamp">
                 <p class="tile-content" v-html="product.description"></p>
                 <p v-if="!product.isBase && editingProduct == null">
-                  <a href="#" v-on:click.prevent="editProduct(product)" class="button">Edit</a><br/>
+                  <a href="#" v-on:click.prevent="editProduct(product)" class="button">Edit</a><br />
                   <a href="#" v-on:click.self="deleteProduct(product, index)" class="button">Delete</a>
                 </p>
               </div>
@@ -81,6 +81,16 @@
             <div class="tile line-clamp">
               <p><a href="#" v-on:click.prevent="removeSelectedApi(index)" class="button">Remove</a></p>
             </div>
+          </div>
+        </div>
+        <div class="form">
+          <div class="form-group">
+            <label for="product-edit-name" class="form-label">Name</label>
+            <input id="product-edit-name" type="text" class="form-control" v-model="productName" />
+          </div>
+          <div class="form-group">
+            <label for="product-edit-desc" class="form-label">Description</label>
+            <input id="product-edit-desc" type="text" class="form-control" v-model="productDescription" />
           </div>
         </div>
         <div v-if="editingProduct" class="button-group-center">
@@ -170,11 +180,22 @@ export default {
       pageNumber: 1,
       totalPages: 0,
       selectedProduct: null as Product | null,
-      editingProduct: null as Product | null
+      editingProduct: null as Product | null,
+      productName: "" as string,
+      productDescription: "" as string
     }
   },
 
   inject: ["secretsPromise", "requestPromise"],
+
+  watch: {
+    "selectedApis": function (val) {
+      if (val && val.length && !this.editingProduct && this.productName == "" && this.productDescription == "") {
+        this.productName = "My Product";
+        this.productDescription = "This is a custom Product made by the Consumer";
+      }
+    }
+  },
 
   methods: {
     loadApis(product: Product) {
@@ -194,6 +215,8 @@ export default {
     clear() {
       this.selectedApis = [];
       this.editingProduct = null;
+      this.productName = "";
+      this.productDescription = "";
       this.clearProduct();
     },
     createProduct() {
@@ -203,8 +226,8 @@ export default {
 
       var product = new Product();
       product.id = (parseInt(this.products[this.products.length - 1].id ?? "0") + 1).toString();
-      product.displayName = "My Product";
-      product.description = "<p>This is a custom Product made by the Consumer.</p>";
+      product.displayName = this.productName!;
+      product.description = this.productDescription!;
       product.isBase = false;
 
       for (let i = 0; i < this.selectedApis.length; i++) {
@@ -214,8 +237,10 @@ export default {
       this.products.push(product);
       this.clear();
     },
-    editProduct(product: Product){
+    editProduct(product: Product) {
       this.editingProduct = product;
+      this.productName = product.displayName!;
+      this.productDescription = product.description!;
       this.selectedApis = [];
 
       for (let i = 0; i < product.apis.length; i++) {

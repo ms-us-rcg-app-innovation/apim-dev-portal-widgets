@@ -1,6 +1,7 @@
 @import "reboot.scss";
 @import "card.scss";
 @import "button.scss";
+@import "forms.scss";
 
 body {
   font-family: "Segoe UI", sans-serif;
@@ -12,7 +13,7 @@ h3 {
   margin-top: 40px;
   font-weight: normal;
   margin-bottom: 10px;
-  
+
   span {
     color:#0078d4
   }
