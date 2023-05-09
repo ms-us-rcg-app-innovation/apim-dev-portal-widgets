@@ -6,6 +6,16 @@
       <p>Select a product to view APIs</p>
       <!-- <input type="search" class="form-control form-control-light" aria-label="Search" placeholder="Search products" spellcheck="false"
             data-bind="textInput: pattern" /> -->
+      <div>
+        <p>User Properties</p>
+        <ul>
+          <li>APIM? Id: {{ user.id }}</li>
+          <li>Object Id: {{ user.objectId }}</li>
+          <li>First Name: {{ user.firstName }}</li>
+          <li>Last Name: {{ user.lastName }}</li>
+          <li>Email: {{ user.email }}</li>
+        </ul>
+      </div>
     </div>
 
     <div style="clear:both"></div>
@@ -117,6 +127,7 @@ import { getValues } from "@azure/api-management-custom-widgets-tools"
 import { valuesDefault } from "../../values"
 import { Product } from "../../models/product";
 import { Api } from "../../models/api";
+import jwtDecode from 'jwt-decode';
 
 export default {
   data() {
@@ -182,7 +193,14 @@ export default {
       selectedProduct: null as Product | null,
       editingProduct: null as Product | null,
       productName: "" as string,
-      productDescription: "" as string
+      productDescription: "" as string,
+      user: {
+        id: "" as string,
+        objectId: "" as string,
+        firstName: "" as string,
+        lastName: "" as string,
+        email: "" as string
+      }
     }
   },
 
@@ -195,6 +213,39 @@ export default {
         this.productDescription = "This is a custom Product made by the Consumer";
       }
     }
+  },
+
+  async mounted() : Promise<void> {
+    const [secrets, request] = await Promise.all([this.secretsPromise, this.requestPromise]);
+    let model = this;
+
+    console.log("secrets", secrets);
+    const userId = secrets.userId;
+    //const userId = "059428e2-830e-4296-be82-0a2519c55f4c";
+    //const userId = "64541d1a217d2018787b32d2";// secrets.userId;
+
+    request(`/users/${userId}`)
+      .then(response => {
+        console.log("response", response);
+        return response;
+      })
+      .then(e => e.json())
+      //.then(j => console.log("j", j))
+      .then(j => {
+        console.log("json", j);
+        return j;
+      })
+      .then(j => {
+        model.user.id = j.name;
+        model.user.objectId = j.properties.identities[0].id; 
+        model.user.firstName = j.properties.firstName;
+        model.user.lastName = j.properties.lastName;
+        model.user.email = j.properties.email;
+      })
+      //.then(({properties}) => console.log("properties", properties))
+      .catch(e => {
+        console.error("Error!", e)
+      })
   },
 
   methods: {
