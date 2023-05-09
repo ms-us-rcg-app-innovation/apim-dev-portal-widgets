@@ -57,7 +57,7 @@
             </div>
             <div class="button-group-center">
               <a href="#" v-on:click.prevent="clearProduct()" class="button">Back to Products</a>
-            </div>  
+            </div>
           </div>
           <div v-else>
             <p>No APIs found</p>
@@ -67,22 +67,26 @@
     </div>
 
     <div class="column">
-        <h2>My APIs</h2>
-        <div v-if="selectedApis.length">
-          <div v-for="(api, index) in selectedApis">
-              <div class="card item-tile">
-                <h3>
-                  <span>{{ api.name }}</span>
-                </h3>
-                <div class="tile line-clamp">
-                  <p><a href="#" v-on:click.prevent="removeSelectedApi(index)" class="button">Remove</a></p>
-                </div>
-              </div>
+      <h2>My APIs</h2>
+      <div v-if="selectedApis.length">
+        <div v-for="(api, index) in selectedApis">
+          <div class="card item-tile">
+            <h3>
+              <span>{{ api.name }}</span>
+            </h3>
+            <div class="tile line-clamp">
+              <p><a href="#" v-on:click.prevent="removeSelectedApi(index)" class="button">Remove</a></p>
             </div>
+          </div>
+
         </div>
-        <div v-else>
-          <p>No APIs selected.</p>
+        <div class="button-group-center">
+          <a href="#" v-on:click.prevent="createProduct()" class="button">Create Product</a>
         </div>
+      </div>
+      <div v-else>
+        <p>No APIs selected.</p>
+      </div>
     </div>
   </div>
   <div v-else class="loading">
@@ -103,17 +107,49 @@ export default {
         {
           id: "1",
           displayName: "product 1",
-          description: "<p>here's a <b>description</b><p>"
+          description: "<p>here's a <b>description</b><p>",
+          apis: [{
+            id: "1",
+            name: "API 1",
+          },
+          {
+            id: "2",
+            name: "API 2",
+          }]
         },
         {
           id: "2",
           displayName: "product 2",
-          description: "<p>here's another <u>description</u><p>"
+          description: "<p>here's another <u>description</u><p>",
+          apis: [{
+            id: "3",
+            name: "API 3",
+          },
+          {
+            id: "4",
+            name: "API 4",
+          },
+          {
+            id: "5",
+            name: "API 5",
+          }]
         },
         {
           id: "3",
           displayName: "product 3",
-          description: "<p>and again, another <i>description</i><p>"
+          description: "<p>and again, another <i>description</i><p>",
+            apis: [{
+            id: "6",
+            name: "API A",
+          },
+          {
+            id: "7",
+            name: "API B",
+          },
+          {
+            id: "8",
+            name: "API C",
+          }]
         }
       ] as Product[],
       apis: [] as Api[],
@@ -138,25 +174,8 @@ export default {
 
   methods: {
     loadApis(product: Product) {
-      const dummyAPIs = [{
-        id: "1",
-        name: "API 1",
-      },
-      {
-        id: "2",
-        name: "API 2",
-      },
-      {
-        id: "3",
-        name: "API 3",
-      },
-      {
-        id: "4",
-        name: "API 4",
-      },] as Api[]
-
       this.selectedProduct = product;
-      this.apis = dummyAPIs;
+      this.apis = product.apis;
     },
     clearProduct() {
       this.selectedProduct = null;
@@ -167,6 +186,24 @@ export default {
     },
     removeSelectedApi(index: number) {
       this.selectedApis.splice(index, 1);
+    },
+    createProduct() {
+      if (!this.selectedApis.length) {
+        return;
+      }
+
+      var product = new Product();
+      product.id = (parseInt(this.products[this.products.length - 1].id ?? "0") + 1).toString();
+      product.displayName = "My Product";
+      product.description = "<p>This is a custom Product made by the Consumer.</p>";
+      
+      for (let i = 0; i < this.selectedApis.length; i++) {
+        product.apis.push(this.selectedApis[i]);
+      }
+
+      this.products.push(product);
+      this.selectedApis = [];
+      this.clearProduct();
     }
   },
 }
