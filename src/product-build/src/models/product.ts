@@ -14,6 +14,7 @@ export class Product {
     public terms?: string;
 
     public apis: Api[] = [];
+    public isBase: boolean = true;
 
     // constructor(contract?: ProductContract) {
     //     this.id = Utils.getResourceName("products", contract?.id!, "shortId");

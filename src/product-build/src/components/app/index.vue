@@ -12,20 +12,23 @@
 
     <div class="column">
       <div class="cards" v-if="selectedProduct == null">
-
         <div class="cards-body" v-if="working">
           <!-- <spinner class="fit"></spinner> -->
           working...
         </div>
         <div class="cards-body animation-fade-in" v-else>
           <h2>Products</h2>
-          <a v-if="products.length > 0" v-for="product in products" href="#" v-on:click.prevent="loadApis(product)">
+          <a v-if="products.length > 0" v-for="(product, index) in products">
             <div class="card item-tile">
-              <h3>
+              <h3 style="cursor: pointer;" v-on:click.prevent="loadApis(product)">
                 <span>{{ product.displayName }}</span>
               </h3>
               <div class="tile line-clamp">
                 <p class="tile-content" v-html="product.description"></p>
+                <p v-if="!product.isBase && editingProduct == null">
+                  <a href="#" v-on:click.prevent="editProduct(product)" class="button">Edit</a><br/>
+                  <a href="#" v-on:click.self="deleteProduct(product, index)" class="button">Delete</a>
+                </p>
               </div>
             </div>
           </a>
@@ -67,7 +70,8 @@
     </div>
 
     <div class="column">
-      <h2>My APIs</h2>
+      <h2 v-if="editingProduct">{{ editingProduct.displayName }} APIs</h2>
+      <h2 v-else>New Product APIs</h2>
       <div v-if="selectedApis.length">
         <div v-for="(api, index) in selectedApis">
           <div class="card item-tile">
@@ -78,10 +82,14 @@
               <p><a href="#" v-on:click.prevent="removeSelectedApi(index)" class="button">Remove</a></p>
             </div>
           </div>
-
         </div>
-        <div class="button-group-center">
+        <div v-if="editingProduct" class="button-group-center">
+          <a href="#" v-on:click.prevent="saveProduct()" class="button">Save Product</a>
+          <a href="#" v-on:click.prevent="clear()" class="button">Cancel</a>
+        </div>
+        <div v-else class="button-group-center">
           <a href="#" v-on:click.prevent="createProduct()" class="button">Create Product</a>
+          <a href="#" v-on:click.prevent="clear()" class="button">Cancel</a>
         </div>
       </div>
       <div v-else>
@@ -108,6 +116,7 @@ export default {
           id: "1",
           displayName: "product 1",
           description: "<p>here's a <b>description</b><p>",
+          isBase: true,
           apis: [{
             id: "1",
             name: "API 1",
@@ -121,6 +130,7 @@ export default {
           id: "2",
           displayName: "product 2",
           description: "<p>here's another <u>description</u><p>",
+          isBase: true,
           apis: [{
             id: "3",
             name: "API 3",
@@ -138,7 +148,8 @@ export default {
           id: "3",
           displayName: "product 3",
           description: "<p>and again, another <i>description</i><p>",
-            apis: [{
+          isBase: true,
+          apis: [{
             id: "6",
             name: "API A",
           },
@@ -158,19 +169,12 @@ export default {
       pattern: "",
       pageNumber: 1,
       totalPages: 0,
-      selectedProduct: null as Product | null
+      selectedProduct: null as Product | null,
+      editingProduct: null as Product | null
     }
   },
 
   inject: ["secretsPromise", "requestPromise"],
-
-  async mounted(): Promise<void> {
-
-  },
-
-  computed: {
-
-  },
 
   methods: {
     loadApis(product: Product) {
@@ -187,6 +191,11 @@ export default {
     removeSelectedApi(index: number) {
       this.selectedApis.splice(index, 1);
     },
+    clear() {
+      this.selectedApis = [];
+      this.editingProduct = null;
+      this.clearProduct();
+    },
     createProduct() {
       if (!this.selectedApis.length) {
         return;
@@ -196,14 +205,45 @@ export default {
       product.id = (parseInt(this.products[this.products.length - 1].id ?? "0") + 1).toString();
       product.displayName = "My Product";
       product.description = "<p>This is a custom Product made by the Consumer.</p>";
-      
+      product.isBase = false;
+
       for (let i = 0; i < this.selectedApis.length; i++) {
         product.apis.push(this.selectedApis[i]);
       }
 
       this.products.push(product);
+      this.clear();
+    },
+    editProduct(product: Product){
+      this.editingProduct = product;
       this.selectedApis = [];
-      this.clearProduct();
+
+      for (let i = 0; i < product.apis.length; i++) {
+        this.selectedApis.push(product.apis[i]);
+      }
+    },
+
+    saveProduct() {
+      if (!this.editingProduct) {
+        return;
+      }
+
+      if (!this.selectedApis.length) {
+        return;
+      }
+
+      var product = this.editingProduct;
+      product.apis = [];
+
+      for (let i = 0; i < this.selectedApis.length; i++) {
+        product.apis.push(this.selectedApis[i]);
+      }
+
+      this.clear();
+    },
+
+    deleteProduct(product: Product, index: number) {
+      this.products.splice(index, 1);
     }
   },
 }
