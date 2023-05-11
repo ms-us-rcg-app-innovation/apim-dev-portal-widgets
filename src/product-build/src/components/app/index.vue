@@ -3,19 +3,7 @@
 <template>
   <div v-if="true" class="height-fill">
     <div class="form-inline max-w-500">
-      <p>Select a product to view APIs</p>
-      <!-- <input type="search" class="form-control form-control-light" aria-label="Search" placeholder="Search products" spellcheck="false"
-            data-bind="textInput: pattern" /> -->
-      <div>
-        <p>User Properties</p>
-        <ul>
-          <li>APIM? Id: {{ user.id }}</li>
-          <li>Object Id: {{ user.objectId }}</li>
-          <li>First Name: {{ user.firstName }}</li>
-          <li>Last Name: {{ user.lastName }}</li>
-          <li>Email: {{ user.email }}</li>
-        </ul>
-      </div>
+      <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
     </div>
 
     <div style="clear:both"></div>
@@ -23,7 +11,6 @@
     <div class="column">
       <div class="cards" v-if="selectedProduct == null">
         <div class="cards-body" v-if="working">
-          <!-- <spinner class="fit"></spinner> -->
           working...
         </div>
         <div class="cards-body animation-fade-in" v-else>
@@ -36,7 +23,7 @@
               <div class="tile line-clamp">
                 <p class="tile-content" v-html="product.description"></p>
                 <p v-if="!product.isBase && editingProduct == null">
-                  <a href="#" v-on:click.prevent="editProduct(product)" class="button">Edit</a><br />
+                  <a href="#" v-on:click.prevent="editProduct(product)" class="button">Edit</a>&nbsp;
                   <a href="#" v-on:click.self="deleteProduct(product, index)" class="button">Delete</a>
                 </p>
               </div>
@@ -44,14 +31,10 @@
           </a>
           <p v-else>No products found</p>
         </div>
-        <div class="cards-footer" v-if="!working && totalPages > 1">
-          <!-- <pagination params="{ pageNumber: $component.pageNumber, totalPages: $component.totalPages }"></pagination> -->
-        </div>
       </div>
 
       <div class="cards" v-if="selectedProduct != null">
         <div class="cards-body" v-if="working">
-          <!-- <spinner class="fit"></spinner> -->
           working...
         </div>
         <div class="cards-body animation-fade-in" v-else>
@@ -127,63 +110,12 @@ import { getValues } from "@azure/api-management-custom-widgets-tools"
 import { valuesDefault } from "../../values"
 import { Product } from "../../models/product";
 import { Api } from "../../models/api";
-import jwtDecode from 'jwt-decode';
+import { ProductService } from "../../models/productService";
 
 export default {
   data() {
     return {
-      products: [
-        {
-          id: "1",
-          displayName: "product 1",
-          description: "<p>here's a <b>description</b><p>",
-          isBase: true,
-          apis: [{
-            id: "1",
-            name: "API 1",
-          },
-          {
-            id: "2",
-            name: "API 2",
-          }]
-        },
-        {
-          id: "2",
-          displayName: "product 2",
-          description: "<p>here's another <u>description</u><p>",
-          isBase: true,
-          apis: [{
-            id: "3",
-            name: "API 3",
-          },
-          {
-            id: "4",
-            name: "API 4",
-          },
-          {
-            id: "5",
-            name: "API 5",
-          }]
-        },
-        {
-          id: "3",
-          displayName: "product 3",
-          description: "<p>and again, another <i>description</i><p>",
-          isBase: true,
-          apis: [{
-            id: "6",
-            name: "API A",
-          },
-          {
-            id: "7",
-            name: "API B",
-          },
-          {
-            id: "8",
-            name: "API C",
-          }]
-        }
-      ] as Product[],
+      products: [] as Product[],
       apis: [] as Api[],
       selectedApis: [] as Api[],
       working: false,
@@ -194,17 +126,12 @@ export default {
       editingProduct: null as Product | null,
       productName: "" as string,
       productDescription: "" as string,
-      user: {
-        id: "" as string,
-        objectId: "" as string,
-        firstName: "" as string,
-        lastName: "" as string,
-        email: "" as string
-      }
+      accessToken: "" as string,
+      endpoint: ""
     }
   },
 
-  inject: ["secretsPromise", "requestPromise"],
+  inject: ["secretsPromise"],
 
   watch: {
     "selectedApis": function (val) {
@@ -215,43 +142,24 @@ export default {
     }
   },
 
-  async mounted() : Promise<void> {
-    const [secrets, request] = await Promise.all([this.secretsPromise, this.requestPromise]);
-    let model = this;
-
-    console.log("secrets", secrets);
-    const userId = secrets.userId;
-    //const userId = "059428e2-830e-4296-be82-0a2519c55f4c";
-    //const userId = "64541d1a217d2018787b32d2";// secrets.userId;
-
-    request(`/users/${userId}`)
-      .then(response => {
-        console.log("response", response);
-        return response;
-      })
-      .then(e => e.json())
-      //.then(j => console.log("j", j))
-      .then(j => {
-        console.log("json", j);
-        return j;
-      })
-      .then(j => {
-        model.user.id = j.name;
-        model.user.objectId = j.properties.identities[0].id; 
-        model.user.firstName = j.properties.firstName;
-        model.user.lastName = j.properties.lastName;
-        model.user.email = j.properties.email;
-      })
-      //.then(({properties}) => console.log("properties", properties))
-      .catch(e => {
-        console.error("Error!", e)
-      })
+  async mounted(): Promise<void> {
+    const secrets = await this.secretsPromise;
+    this.accessToken = secrets.token; // SAS token
+    await this.loadProducts();
   },
 
   methods: {
-    loadApis(product: Product) {
+    async loadProducts(): Promise<void> {
+      let productService = new ProductService(this.endpoint, this.accessToken);
+      var response = await productService.getList();
+      this.products = response.products ?? [];
+    },
+    async loadApis(product: Product): Promise<void> {
+      let productService = new ProductService(this.endpoint, this.accessToken);
+      var response = await productService.getApis(product.id!);
+
       this.selectedProduct = product;
-      this.apis = product.apis;
+      this.apis = response.apis ?? [];
     },
     clearProduct() {
       this.selectedProduct = null;
@@ -270,13 +178,12 @@ export default {
       this.productDescription = "";
       this.clearProduct();
     },
-    createProduct() {
+    async createProduct() : Promise<void> {
       if (!this.selectedApis.length) {
         return;
       }
 
       var product = new Product();
-      product.id = (parseInt(this.products[this.products.length - 1].id ?? "0") + 1).toString();
       product.displayName = this.productName!;
       product.description = this.productDescription!;
       product.isBase = false;
@@ -284,6 +191,14 @@ export default {
       for (let i = 0; i < this.selectedApis.length; i++) {
         product.apis.push(this.selectedApis[i]);
       }
+
+      let productService = new ProductService(this.endpoint, this.accessToken);
+      var response = await productService.saveProduct(product);
+
+      if (!response.product) {
+        throw new Error("Product not returned.");
+      }
+      product.id = response.product.id;
 
       this.products.push(product);
       this.clear();
@@ -299,7 +214,7 @@ export default {
       }
     },
 
-    saveProduct() {
+    async saveProduct(): Promise<void> {
       if (!this.editingProduct) {
         return;
       }
@@ -315,10 +230,16 @@ export default {
         product.apis.push(this.selectedApis[i]);
       }
 
+      let productService = new ProductService(this.endpoint, this.accessToken);
+      await productService.saveProduct(product);
+
       this.clear();
     },
 
-    deleteProduct(product: Product, index: number) {
+    async deleteProduct(product: Product, index: number) : Promise<void> {
+      let productService = new ProductService(this.endpoint, this.accessToken);
+      await productService.deleteProduct(product.id!)
+
       this.products.splice(index, 1);
     }
   },
