@@ -12,10 +12,10 @@ export class ProductService {
     private baseProductTag: string;
     private sasToken: string;
 
-    constructor(endpoint: string, sasToken: string, baseProductTag?: string) {
+    constructor(endpoint: string, sasToken: string, baseProductTag: string) {
         this.endpoint = endpoint;
         this.sasToken = sasToken;
-        this.baseProductTag = baseProductTag ?? "base-product";
+        this.baseProductTag = baseProductTag;
     }
 
     public async getList(): Promise<GetProductsResponse> {

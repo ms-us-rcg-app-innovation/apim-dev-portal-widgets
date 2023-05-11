@@ -119,15 +119,15 @@ export default {
       apis: [] as Api[],
       selectedApis: [] as Api[],
       working: false,
-      pattern: "",
-      pageNumber: 1,
-      totalPages: 0,
       selectedProduct: null as Product | null,
       editingProduct: null as Product | null,
       productName: "" as string,
       productDescription: "" as string,
+      productNamePlaceholder: "" as string,
+      productDescriptionPlaceholder: "" as string,
       accessToken: "" as string,
-      endpoint: ""
+      endpoint: "" as string,
+      baseProductTag: "" as string
     }
   },
 
@@ -136,27 +136,36 @@ export default {
   watch: {
     "selectedApis": function (val) {
       if (val && val.length && !this.editingProduct && this.productName == "" && this.productDescription == "") {
-        this.productName = "My Product";
-        this.productDescription = "This is a custom Product made by the Consumer";
+        this.productName = this.productNamePlaceholder;
+        this.productDescription = this.productDescriptionPlaceholder;
       }
     }
   },
 
   async mounted(): Promise<void> {
+    const editorData = getValues(valuesDefault)
+
+    this.endpoint = editorData.endpoint;
+    this.baseProductTag = editorData.baseProductTag;
+    this.productDescriptionPlaceholder = editorData.productDescriptionPlaceholder;
+    this.productNamePlaceholder = editorData.productNamePlaceholder;
+
     const secrets = await this.secretsPromise;
     this.accessToken = secrets.token; // SAS token
+
     await this.loadProducts();
   },
 
   methods: {
+    getProductService() {
+      return new ProductService(this.endpoint, this.accessToken, this.baseProductTag);
+    },
     async loadProducts(): Promise<void> {
-      let productService = new ProductService(this.endpoint, this.accessToken);
-      var response = await productService.getList();
+      var response = await this.getProductService().getList();
       this.products = response.products ?? [];
     },
     async loadApis(product: Product): Promise<void> {
-      let productService = new ProductService(this.endpoint, this.accessToken);
-      var response = await productService.getApis(product.id!);
+      var response = await this.getProductService().getApis(product.id!);
 
       this.selectedProduct = product;
       this.apis = response.apis ?? [];
@@ -192,8 +201,7 @@ export default {
         product.apis.push(this.selectedApis[i]);
       }
 
-      let productService = new ProductService(this.endpoint, this.accessToken);
-      var response = await productService.saveProduct(product);
+      var response = await this.getProductService().saveProduct(product);
 
       if (!response.product) {
         throw new Error("Product not returned.");
@@ -230,15 +238,13 @@ export default {
         product.apis.push(this.selectedApis[i]);
       }
 
-      let productService = new ProductService(this.endpoint, this.accessToken);
-      await productService.saveProduct(product);
+      await this.getProductService().saveProduct(product);
 
       this.clear();
     },
 
     async deleteProduct(product: Product, index: number) : Promise<void> {
-      let productService = new ProductService(this.endpoint, this.accessToken);
-      await productService.deleteProduct(product.id!)
+      await this.getProductService().deleteProduct(product.id!)
 
       this.products.splice(index, 1);
     }
