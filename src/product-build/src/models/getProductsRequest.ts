@@ -7,4 +7,8 @@ export class GetProductsRequest extends RequestBase {
         super(sasToken);
         this.baseProductTag = baseProductTag;
     }
+
+    get path() {
+        return `/products?token=${this.sasToken}&baseProductTag=${this.baseProductTag}`
+    } 
 }

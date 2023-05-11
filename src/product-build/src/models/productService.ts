@@ -21,12 +21,11 @@ export class ProductService {
     public async getList(): Promise<GetProductsResponse> {
         let request = new GetProductsRequest(this.sasToken, this.baseProductTag);
 
-        let response = await fetch(`${this.endpoint}/products`, {
+        let response = await fetch(`${this.endpoint}${request.path}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify(request),
+            }
         });
 
         if (!response.ok) {
@@ -40,12 +39,11 @@ export class ProductService {
     public async getApis(productId: string): Promise<GetApisResponse> {
         let request = new GetApisRequest(this.sasToken, productId);
 
-        let response = await fetch(`${this.endpoint}/apis`, {
+        let response = await fetch(`${this.endpoint}${request.path}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify(request),
+            }
         });
 
         if (!response.ok) {
