@@ -9,6 +9,6 @@ export class GetProductsRequest extends RequestBase {
     }
 
     get path() {
-        return `/products?token=${this.sasToken}&baseProductTag=${this.baseProductTag}`
+        return `/list_tagged_products?token=${this.sasToken}&tagIds=${this.baseProductTag}`
     } 
 }

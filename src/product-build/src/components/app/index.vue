@@ -4,6 +4,14 @@
   <div v-if="true" class="height-fill">
     <div class="form-inline max-w-500">
       <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
+      <!-- TODO search -->
+      <div>
+        <h3>Temp Debugging Only</h3>
+        <ul>
+          <li>UserId: {{ userId  }}</li>
+          <li>SAS Token: {{ accessToken }}</li>
+        </ul>
+      </div>
     </div>
 
     <div style="clear:both"></div>
@@ -23,7 +31,6 @@
               <div class="tile line-clamp">
                 <p class="tile-content" v-html="product.description"></p>
                 <p v-if="!product.isBase && editingProduct == null">
-                  <a href="#" v-on:click.prevent="editProduct(product)" class="button">Edit</a>&nbsp;
                   <a href="#" v-on:click.self="deleteProduct(product, index)" class="button">Delete</a>
                 </p>
               </div>
@@ -126,6 +133,7 @@ export default {
       productNamePlaceholder: "" as string,
       productDescriptionPlaceholder: "" as string,
       accessToken: "" as string,
+      userId: "" as string,
       endpoint: "" as string,
       baseProductTag: "" as string
     }
@@ -152,6 +160,7 @@ export default {
 
     const secrets = await this.secretsPromise;
     this.accessToken = secrets.token; // SAS token
+    this.userId = secrets.userId; // TODO - testing only
 
     await this.loadProducts();
   },
@@ -196,30 +205,19 @@ export default {
       product.displayName = this.productName!;
       product.description = this.productDescription!;
       product.isBase = false;
-
-      for (let i = 0; i < this.selectedApis.length; i++) {
-        product.apis.push(this.selectedApis[i]);
-      }
+      product.setApiIds(this.selectedApis);
 
       var response = await this.getProductService().saveProduct(product);
 
       if (!response.product) {
         throw new Error("Product not returned.");
       }
+
+
       product.id = response.product.id;
 
       this.products.push(product);
       this.clear();
-    },
-    editProduct(product: Product) {
-      this.editingProduct = product;
-      this.productName = product.displayName!;
-      this.productDescription = product.description!;
-      this.selectedApis = [];
-
-      for (let i = 0; i < product.apis.length; i++) {
-        this.selectedApis.push(product.apis[i]);
-      }
     },
 
     async saveProduct(): Promise<void> {
@@ -232,11 +230,7 @@ export default {
       }
 
       var product = this.editingProduct;
-      product.apis = [];
-
-      for (let i = 0; i < this.selectedApis.length; i++) {
-        product.apis.push(this.selectedApis[i]);
-      }
+      product.setApiIds(this.selectedApis)
 
       await this.getProductService().saveProduct(product);
 

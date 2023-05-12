@@ -57,7 +57,7 @@ export class ProductService {
     public async saveProduct(product: Product): Promise<SaveProductResponse> {
         let request = new SaveProductRequest(this.sasToken, product);
 
-        let response = await fetch(`${this.endpoint}/product`, {
+        let response = await fetch(`${this.endpoint}/create_product`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export class ProductService {
     public async deleteProduct(productId: string): Promise<void> {
         let request = new DeleteProductRequest(this.sasToken, productId);
 
-        let response = await fetch(`${this.endpoint}/product`, {
+        let response = await fetch(`${this.endpoint}/delete_product`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
