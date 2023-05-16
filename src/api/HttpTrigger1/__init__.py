@@ -93,7 +93,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         if productApis is None:
             return func.HttpResponse(
-                "Please pass a list of productApis on the query string or in the request body example: /subscriptions/2e926ce6-8aad-455c-b48b-7203d9a34b27/resourceGroups/apim-custom-portal/providers/Microsoft.ApiManagement/service/custom-portal/products/testbaseproduct1/apis/testapi1",
+                "Please pass a list of productApis on the query string or in the request body example: /subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.ApiManagement/service/apimName/products/testbaseproduct1/apis/testapi1",
                 status_code=400
             )
         else:
