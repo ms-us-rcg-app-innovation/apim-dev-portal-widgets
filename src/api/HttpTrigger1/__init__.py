@@ -34,10 +34,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     # Parse the route
     route = req.route_params.get('route', '')
-
-    if req.method == "POST" and route == "create_apim_product":
-        return create_apim_product(req)
-    
+  
     if req.method == "POST" and route == "list_tags":
         return list_tags(req)
     
