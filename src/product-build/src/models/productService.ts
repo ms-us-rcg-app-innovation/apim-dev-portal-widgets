@@ -3,6 +3,7 @@ import { GetProductsResponse } from "./getProductsResponse"
 import { GetApisRequest } from "./getApisRequest"
 import { GetApisResponse } from "./getApisResponse"
 import { Product } from "./product"
+import { Api } from "./api"
 import { SaveProductRequest } from "./saveProductRequest"
 import { SaveProductResponse } from "./saveProductResponse"
 import { DeleteProductRequest } from "./deleteProductRequest"
@@ -19,21 +20,48 @@ export class ProductService {
     }
 
     public async getList(): Promise<GetProductsResponse> {
-        let request = new GetProductsRequest(this.sasToken, this.baseProductTag);
+        let baseProductsRequest = new GetProductsRequest(this.sasToken, this.baseProductTag);
+        let userProductsRequest = new GetProductsRequest(this.sasToken);
 
+        let baseProductResponse = await this.getListInternal(baseProductsRequest);
+        let userProductsResponse = await this.getListInternal(userProductsRequest);
+
+        if (baseProductResponse.products) {
+            for (let i = 0; i < baseProductResponse.products.length; i++) {
+                baseProductResponse.products[i].isBase = true;
+            }
+        }
+       
+        let productResponse =  new GetProductsResponse();
+        productResponse.products = baseProductResponse.products?.concat(userProductsResponse.products ?? []);
+
+        return productResponse;
+    }
+
+    private async getListInternal(request: GetProductsRequest) : Promise<GetProductsResponse> {
         let response = await fetch(`${this.endpoint}${request.path}`, {
             method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            }
+            headers: request.headers
         });
 
         if (!response.ok) {
             throw new Error("Failed to get list of Products");
         }
 
-        let responseJson: GetProductsResponse = await response.json();
-        return responseJson;
+        // TODO - logic to set isBase - need a new call for list_user_products
+
+        let responseProductJson: Product[] = await response.json();
+
+        for (let i = 0; i < responseProductJson.length; i++) {
+            if (!responseProductJson[i].displayName && responseProductJson[i].name) {
+                responseProductJson[i].displayName = responseProductJson[i].name;
+            }
+        }
+
+        let productResponse =  new GetProductsResponse();
+        productResponse.products = responseProductJson;
+
+        return productResponse;
     }
 
     public async getApis(productId: string): Promise<GetApisResponse> {
@@ -41,32 +69,37 @@ export class ProductService {
 
         let response = await fetch(`${this.endpoint}${request.path}`, {
             method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            }
+            headers: request.headers
         });
 
         if (!response.ok) {
             throw new Error("Failed to get list of Apis");
         }
 
-        let responseJson: GetApisResponse = await response.json();
-        return responseJson;
+        let responseApiJson: Api[] = await response.json();
+
+        for (let i = 0; i < responseApiJson.length; i++) {
+            if (!responseApiJson[i].displayName && responseApiJson[i].name) {
+                responseApiJson[i].displayName = responseApiJson[i].name;
+            }
+        }
+
+        let apiResponse =  new GetApisResponse();
+        apiResponse.apis = responseApiJson;
+
+        return apiResponse;
     }
 
     public async saveProduct(product: Product): Promise<SaveProductResponse> {
         let request = new SaveProductRequest(this.sasToken, product);
 
-        let response = await fetch(`${this.endpoint}/create_product`, {
+        let response = await fetch(`${this.endpoint}${request.path}`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(request),
+            headers: request.headers
         });
 
         if (!response.ok) {
-            throw new Error("Failed to get list of Apis");
+            throw new Error("Failed to save Product");
         }
 
         let responseJson: SaveProductResponse = await response.json();
@@ -76,17 +109,13 @@ export class ProductService {
     public async deleteProduct(productId: string): Promise<void> {
         let request = new DeleteProductRequest(this.sasToken, productId);
 
-        let response = await fetch(`${this.endpoint}/delete_product`, {
+        let response = await fetch(`${this.endpoint}${request.path}`, {
             method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(request),
+            headers: request.headers
         });
 
         if (!response.ok) {
             throw new Error("Failed to get list of Apis");
         }
     }
-
 }

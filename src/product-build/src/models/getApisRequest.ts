@@ -9,6 +9,6 @@ export class GetApisRequest extends RequestBase {
     }
 
     get path() {
-        return `/list_apis_of_products?token=${this.sasToken}&productIds=${this.productId}`;
+        return `/list_apis_of_products?productIds=${this.productId}`;
     } 
 }

@@ -8,4 +8,8 @@ export class SaveProductRequest extends RequestBase {
         super(sasToken);
         this.product = product;
     }
+
+    get path() {
+        return `/create_product?productApis=${this.product.apiIds}`;
+    } 
 }

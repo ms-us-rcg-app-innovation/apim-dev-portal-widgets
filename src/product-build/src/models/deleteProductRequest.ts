@@ -7,4 +7,8 @@ export class DeleteProductRequest extends RequestBase {
         super(sasToken);
         this.productId = productId;
     }
+
+    get path() {
+        return `/delete_product?productId=${this.productId}`;
+    } 
 }

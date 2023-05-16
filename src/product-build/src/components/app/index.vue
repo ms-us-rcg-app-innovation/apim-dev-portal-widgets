@@ -5,6 +5,7 @@
     <div class="form-inline max-w-500">
       <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
       <!-- TODO search -->
+      <!-- TODO loading indicator -->
       <div>
         <h3>Temp Debugging Only</h3>
         <ul>
@@ -23,7 +24,7 @@
         </div>
         <div class="cards-body animation-fade-in" v-else>
           <h2>Products</h2>
-          <a v-if="products.length > 0" v-for="(product, index) in products">
+          <a v-if="products.length > 0" v-for="product in products">
             <div class="card item-tile">
               <h3 style="cursor: pointer;" v-on:click.prevent="loadApis(product)">
                 <span>{{ product.displayName }}</span>
@@ -31,7 +32,7 @@
               <div class="tile line-clamp">
                 <p class="tile-content" v-html="product.description"></p>
                 <p v-if="!product.isBase && editingProduct == null">
-                  <a href="#" v-on:click.self="deleteProduct(product, index)" class="button">Delete</a>
+                  <a href="#" v-on:click.self="deleteProduct(product)" class="button">Delete</a>
                 </p>
               </div>
             </div>
@@ -83,7 +84,7 @@
             </div>
           </div>
         </div>
-        <div class="form">
+        <!-- <div class="form">
           <div class="form-group">
             <label for="product-edit-name" class="form-label">Name</label>
             <input id="product-edit-name" type="text" class="form-control" v-model="productName" />
@@ -92,12 +93,8 @@
             <label for="product-edit-desc" class="form-label">Description</label>
             <input id="product-edit-desc" type="text" class="form-control" v-model="productDescription" />
           </div>
-        </div>
-        <div v-if="editingProduct" class="button-group-center">
-          <a href="#" v-on:click.prevent="saveProduct()" class="button">Save Product</a>
-          <a href="#" v-on:click.prevent="clear()" class="button">Cancel</a>
-        </div>
-        <div v-else class="button-group-center">
+        </div> -->
+        <div class="button-group-center">
           <a href="#" v-on:click.prevent="createProduct()" class="button">Create Product</a>
           <a href="#" v-on:click.prevent="clear()" class="button">Cancel</a>
         </div>
@@ -162,6 +159,9 @@ export default {
     this.accessToken = secrets.token; // SAS token
     this.userId = secrets.userId; // TODO - testing only
 
+    console.log("token", this.accessToken);
+    console.log("userId", this.userId);
+
     await this.loadProducts();
   },
 
@@ -196,7 +196,14 @@ export default {
       this.productDescription = "";
       this.clearProduct();
     },
+    async refresh() : Promise<void> {
+      this.clear();
+      await this.loadProducts();
+    },
+
     async createProduct() : Promise<void> {
+       // TODO - prevent multiple clicks
+
       if (!this.selectedApis.length) {
         return;
       }
@@ -207,40 +214,14 @@ export default {
       product.isBase = false;
       product.setApiIds(this.selectedApis);
 
-      var response = await this.getProductService().saveProduct(product);
-
-      if (!response.product) {
-        throw new Error("Product not returned.");
-      }
-
-
-      product.id = response.product.id;
-
-      this.products.push(product);
-      this.clear();
-    },
-
-    async saveProduct(): Promise<void> {
-      if (!this.editingProduct) {
-        return;
-      }
-
-      if (!this.selectedApis.length) {
-        return;
-      }
-
-      var product = this.editingProduct;
-      product.setApiIds(this.selectedApis)
-
       await this.getProductService().saveProduct(product);
-
-      this.clear();
+      await this.refresh();
     },
 
-    async deleteProduct(product: Product, index: number) : Promise<void> {
+  
+    async deleteProduct(product: Product) : Promise<void> {
       await this.getProductService().deleteProduct(product.id!)
-
-      this.products.splice(index, 1);
+      await this.refresh();
     }
   },
 }
