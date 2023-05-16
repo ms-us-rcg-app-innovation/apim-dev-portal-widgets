@@ -23,30 +23,14 @@ credential = DefaultAzureCredential()
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
-    # token = req.params.get('token')
-
-    # if token is None:
-    #     return func.HttpResponse(
-    #         "Please pass a token on the query string or in the request body",
-    #         status_code=400
-    #     )
-    
-    # userid = verify_user(token)
-    # if userid == "invalid":
-    #     return func.HttpResponse(
-    #         "Token was passed but is invalid",
-    #         status_code=400
-    #     )
-
-
     auth_header = req.headers.get('Authorization')
     userid = verify_user(auth_header)
     print(auth_header)
-    # if userid == "invalid":
-    #     return func.HttpResponse(
-    #         "Token was passed but is invalid",
-    #         status_code=400
-    #     )
+    if userid == "invalid":
+        return func.HttpResponse(
+            "Token was passed but is invalid",
+            status_code=400
+        )
 
     # Parse the route
     route = req.route_params.get('route', '')
@@ -59,9 +43,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     
     if req.method == "GET" and route == "list_apis_of_tagged_products":
         tagIds = req.params.get('tagIds')
-        #will also pass token as sas token that will be used to call /identity
-        # https://custom-portal.management.azure-api.net/subscriptions/2e926ce6-8aad-455c-b48b-7203d9a34b27/resourceGroups/apim-custom-portal/providers/Microsoft.ApiManagement/service/custom-portal/identity?api-version=2022-08-01
-        # SharedAccessSignature token="1&20230512161217&XqbCsKC1iXQ2OeBVnmkTRi2LZ7cn0PRchZ3mkWicrcptN7AiRqVfntc35IYcCeE2TlYb4ZYjW1dZp8DrnDXepw==",refresh="true"
         if tagIds is None:
             return func.HttpResponse(
                 "Please pass a list of tagIds on the query string or in the request body",
@@ -221,22 +202,6 @@ def list_tags(req: HttpRequest) -> HttpResponse:
             json.dumps({"error": response.text}),
             status_code=400
         )
-    
-# def temp(req: HttpRequest) -> HttpResponse:
-#     print("temp")
-#     headers = create_headers()
-#     apim_endpoint1 = f'https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/testBaseProduct1/tags/testTag11?api-version=2022-08-01?api-version=2022-08-01'
-#     print(apim_endpoint1)
-#     apim_endpoint2 = f'https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/testBaseProduct2/tags/testTag12?api-version=2022-08-01?api-version=2022-08-01'
-#     print(apim_endpoint1)
-#     response = requests.put(apim_endpoint1, headers=headers)
-#     response2 = requests.put(apim_endpoint2, headers=headers)
-#     # print response with any error messages
-#     print(response)
-
-#     print(response2)
-#     # print(response2)
-#     return("hi")
 
 def create_apim_product(req: HttpRequest) -> HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
