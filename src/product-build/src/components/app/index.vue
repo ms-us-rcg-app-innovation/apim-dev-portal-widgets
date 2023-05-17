@@ -3,8 +3,9 @@
 <template>
   <div v-if="!loading" class="height-fill">
     <div class="form-inline max-w-500">
+    <input type="search" class="form-control form-control-light" aria-label="Search" placeholder="Search products" spellcheck="false" v-model="searchPattern" />
+
       <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
-      <!-- TODO search -->
 
       <div v-if="settings.debugModeEnabled">
         <h3>Temp Debugging Only</h3>
@@ -24,7 +25,7 @@
         </div>
         <div class="cards-body animation-fade-in" v-else>
           <h2>Products</h2>
-          <a v-if="products.length > 0" v-for="product in products">
+          <a v-if="filteredProducts.length > 0" v-for="product in filteredProducts">
             <div class="card item-tile">
               <h3 style="cursor: pointer;" v-on:click.prevent="loadApis(product)">
                 <span>{{ product.displayName }}</span>
@@ -120,6 +121,7 @@ export default {
       products: [] as Product[],
       apis: [] as Api[],
       selectedApis: [] as Api[],
+      searchPattern: "" as String,
       working: false,
       loading: false,
       selectedProduct: null as Product | null,
@@ -162,6 +164,17 @@ export default {
     }
 
     await this.loadProducts();
+  },
+
+  computed: {
+    filteredProducts(): Product[]  {
+      let pattern = (this.searchPattern as string)?.toLowerCase();
+      if (!pattern) {
+        return this.products;
+      }
+
+      return this.products.filter(p => p.displayName?.toLowerCase().includes(pattern) || p.description?.toLowerCase().includes(pattern));
+    }
   },
 
   methods: {
