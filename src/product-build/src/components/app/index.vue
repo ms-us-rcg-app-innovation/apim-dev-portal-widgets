@@ -6,7 +6,7 @@
       <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
       <!-- TODO search -->
       <!-- TODO loading indicator -->
-      <div>
+      <div v-if="settings.debugModeEnabled">
         <h3>Temp Debugging Only</h3>
         <ul>
           <li>UserId: {{ userId  }}</li>
@@ -111,7 +111,7 @@
 
 <script lang="ts">
 import { getValues } from "@azure/api-management-custom-widgets-tools"
-import { valuesDefault } from "../../values"
+import { Values, valuesDefault } from "../../values"
 import { Product } from "../../models/product";
 import { Api } from "../../models/api";
 import { ProductService } from "../../models/productService";
@@ -127,12 +127,9 @@ export default {
       editingProduct: null as Product | null,
       productName: "" as string,
       productDescription: "" as string,
-      productNamePlaceholder: "" as string,
-      productDescriptionPlaceholder: "" as string,
+      settings: {} as Values,
       accessToken: "" as string,
       userId: "" as string,
-      endpoint: "" as string,
-      baseProductTag: "" as string
     }
   },
 
@@ -141,8 +138,8 @@ export default {
   watch: {
     "selectedApis": function (val) {
       if (val && val.length && !this.editingProduct && this.productName == "" && this.productDescription == "") {
-        this.productName = this.productNamePlaceholder;
-        this.productDescription = this.productDescriptionPlaceholder;
+        this.productName = this.settings.productNamePlaceholder;
+        this.productDescription = this.settings.productDescriptionPlaceholder;
       }
     }
   },
@@ -150,10 +147,11 @@ export default {
   async mounted(): Promise<void> {
     const editorData = getValues(valuesDefault)
 
-    this.endpoint = editorData.endpoint;
-    this.baseProductTag = editorData.baseProductTag;
-    this.productDescriptionPlaceholder = editorData.productDescriptionPlaceholder;
-    this.productNamePlaceholder = editorData.productNamePlaceholder;
+    this.settings.endpoint = editorData.endpoint;
+    this.settings.baseProductTag = editorData.baseProductTag;
+    this.settings.productDescriptionPlaceholder = editorData.productDescriptionPlaceholder;
+    this.settings.productNamePlaceholder = editorData.productNamePlaceholder;
+    this.settings.debugModeEnabled = editorData.debugModeEnabled;
 
     const secrets = await this.secretsPromise;
     this.accessToken = secrets.token; // SAS token
@@ -167,7 +165,7 @@ export default {
 
   methods: {
     getProductService() {
-      return new ProductService(this.endpoint, this.accessToken, this.baseProductTag);
+      return new ProductService(this.settings.endpoint, this.accessToken, this.settings.baseProductTag);
     },
     async loadProducts(): Promise<void> {
       var response = await this.getProductService().getList();

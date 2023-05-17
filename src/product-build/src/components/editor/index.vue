@@ -18,6 +18,10 @@
       <label for="baseProductTag" class="form-label">Base Product Tag</label>
       <input id="baseProductTag" type="text" class="form-control" v-model="baseProductTag" :placeholder="valuesDefault.baseProductTag" />
     </div>
+    <div class="form-group">
+      <label for="debugMode" class="form-label">Enable Debug Mode?</label>
+      <input id="debugMode" type="checkbox" class="form-control" v-model="debugModeEnabled" />
+    </div>
   </div>
 </template>
 
@@ -32,6 +36,7 @@ export default {
       productDescriptionPlaceholder: "",
       endpoint: "",
       baseProductTag: "",
+      debugModeEnabled: false,
       valuesDefault,
       onChange: (values: any) => {}
     }
@@ -46,6 +51,7 @@ export default {
     this.productDescriptionPlaceholder = editorData.productDescriptionPlaceholder ?? "";
     this.endpoint = editorData.endpoint ?? "";
     this.baseProductTag = editorData.baseProductTag ?? "";
+    this.debugModeEnabled = editorData.debugModeEnabled ?? false;
   },
 
   watch: {
@@ -60,6 +66,9 @@ export default {
     },
     baseProductTag(newValue: string): void {
       this.onChange({baseProductTag: newValue})
+    },
+    debugModeEnabled(newValue: boolean): void {
+      this.onChange({debugModeEnabled: newValue})
     },
   }
 }
