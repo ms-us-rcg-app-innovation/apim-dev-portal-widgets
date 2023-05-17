@@ -1,11 +1,11 @@
 <style src="../../styles/app.scss"></style>
 
 <template>
-  <div v-if="true" class="height-fill">
+  <div v-if="!loading" class="height-fill">
     <div class="form-inline max-w-500">
       <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
       <!-- TODO search -->
-      <!-- TODO loading indicator -->
+
       <div v-if="settings.debugModeEnabled">
         <h3>Temp Debugging Only</h3>
         <ul>
@@ -32,7 +32,7 @@
               <div class="tile line-clamp">
                 <p class="tile-content" v-html="product.description"></p>
                 <p v-if="!product.isBase && editingProduct == null">
-                  <a href="#" v-on:click.self="deleteProduct(product)" class="button">Delete</a>
+                  <a href="#" v-on:click.self="deleteProduct(product)" class="button button-delete button-small">Delete</a>
                 </p>
               </div>
             </div>
@@ -55,12 +55,12 @@
                 </h3>
                 <div class="tile line-clamp">
                   <p class="tile-content" v-html="api.description"></p>
-                  <p><a href="#" v-on:click.prevent="addApiToProduct(api)" class="button">Add to My Product</a></p>
+                  <p><a href="#" v-on:click.prevent="addApiToProduct(api)" class="button button-small">Add to My Product</a></p>
                 </div>
               </div>
             </div>
             <div class="button-group-center">
-              <a href="#" v-on:click.prevent="clearProduct()" class="button">Back to Products</a>
+              <a href="#" v-on:click.prevent="clearProduct()" class="button button-small button-cancel">Back to Products</a>
             </div>
           </div>
           <div v-else>
@@ -80,7 +80,7 @@
               <span>{{ api.name }}</span>
             </h3>
             <div class="tile line-clamp">
-              <p><a href="#" v-on:click.prevent="removeSelectedApi(index)" class="button">Remove</a></p>
+              <p><a href="#" v-on:click.prevent="removeSelectedApi(index)" class="button button-small button-delete">Remove</a></p>
             </div>
           </div>
         </div>
@@ -95,8 +95,8 @@
           </div>
         </div> -->
         <div class="button-group-center">
-          <a href="#" v-on:click.prevent="createProduct()" class="button">Create Product</a>
-          <a href="#" v-on:click.prevent="clear()" class="button">Cancel</a>
+          <a href="#" v-on:click.prevent="createProduct()" class="button button-small">Create Product</a>
+          <a href="#" v-on:click.prevent="clear()" class="button button-cancel button-small">Cancel</a>
         </div>
       </div>
       <div v-else>
@@ -104,9 +104,7 @@
       </div>
     </div>
   </div>
-  <div v-else class="loading">
-    loading...
-  </div>
+  <div v-else class="loading"></div>
 </template>
 
 <script lang="ts">
@@ -123,6 +121,7 @@ export default {
       apis: [] as Api[],
       selectedApis: [] as Api[],
       working: false,
+      loading: false,
       selectedProduct: null as Product | null,
       editingProduct: null as Product | null,
       productName: "" as string,
@@ -155,10 +154,12 @@ export default {
 
     const secrets = await this.secretsPromise;
     this.accessToken = secrets.token; // SAS token
-    this.userId = secrets.userId; // TODO - testing only
+    this.userId = secrets.userId;
 
-    console.log("token", this.accessToken);
-    console.log("userId", this.userId);
+    if (this.settings.debugModeEnabled) {
+      console.log("token", this.accessToken);
+      console.log("userId", this.userId);
+    }
 
     await this.loadProducts();
   },
@@ -168,14 +169,25 @@ export default {
       return new ProductService(this.settings.endpoint, this.accessToken, this.settings.baseProductTag);
     },
     async loadProducts(): Promise<void> {
-      var response = await this.getProductService().getList();
-      this.products = response.products ?? [];
+      try {
+        this.loading = true;
+        var response = await this.getProductService().getList();
+        this.products = response.products ?? [];
+      } finally {
+        this.loading = false;
+      }
     },
     async loadApis(product: Product): Promise<void> {
-      var response = await this.getProductService().getApis(product.id!);
+      try {
+        this.loading = true;
+        var response = await this.getProductService().getApis(product.id!);
 
-      this.selectedProduct = product;
-      this.apis = response.apis ?? [];
+        this.selectedProduct = product;
+        this.apis = response.apis ?? [];
+      } finally {
+        this.loading = false;
+      }
+      
     },
     clearProduct() {
       this.selectedProduct = null;
@@ -200,8 +212,6 @@ export default {
     },
 
     async createProduct() : Promise<void> {
-       // TODO - prevent multiple clicks
-
       if (!this.selectedApis.length) {
         return;
       }
@@ -212,13 +222,25 @@ export default {
       product.isBase = false;
       product.setApiIds(this.selectedApis);
 
-      await this.getProductService().saveProduct(product);
+      try {
+        this.loading = true;
+        await this.getProductService().saveProduct(product);
+      } finally {
+        this.loading = false;
+      }
+     
       await this.refresh();
     },
 
   
     async deleteProduct(product: Product) : Promise<void> {
-      await this.getProductService().deleteProduct(product.id!)
+      try {
+        this.loading = true;
+        await this.getProductService().deleteProduct(product.id!)
+      } finally {
+        this.loading = false;
+      }
+
       await this.refresh();
     }
   },

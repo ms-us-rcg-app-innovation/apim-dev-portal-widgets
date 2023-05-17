@@ -48,8 +48,6 @@ export class ProductService {
             throw new Error("Failed to get list of Products");
         }
 
-        // TODO - logic to set isBase - need a new call for list_user_products
-
         let responseProductJson: Product[] = await response.json();
 
         for (let i = 0; i < responseProductJson.length; i++) {
