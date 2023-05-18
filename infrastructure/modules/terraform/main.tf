@@ -26,29 +26,33 @@ resource "random_string" "rand" {
   special = false
 }
 
-resource "azurerm_resource_group" "apim_portal" {
+resource "azurerm_resource_group" "apim" {
   name     = local.resource_group_name
   location = var.location
 }
 
-module "apim_portal" {
+module "apim" {
   source              = "./modules/apim"
   apim_name           = local.apim_name
   resource_group_name = local.resource_group_name
   location            = var.location
   publisher_name      = var.publisher_name
   publisher_email     = var.publisher_email
-  apim_sku            = var.apim_sku
+  sku                 = var.apim_sku
+  sku_count           = var.apim_sku_count
 }
 
 module "widget_func" {
-    source              = "./modules/function"
-    app_name            = local.widget_func_name
-    resource_group_name = local.resource_group_name
-    location            = var.location
-    app_settings        = {}
-    dotnet_version      = "6.0"
-    host_sku            = "EP1"
-    maximum_elastic_worker_count = 1
-    elastic_instance_minimum = 1
+  source              = "./modules/function"
+  app_name            = local.widget_func_name
+  resource_group_name = local.resource_group_name
+  location            = var.location
+  python_version      = "3.9"
+  app_settings = {
+    "FUNCTIONS_WORKER_RUNTIME" = "python"
+  }
+  dotnet_version               = "6.0"
+  host_sku                     = "EP1"
+  maximum_elastic_worker_count = 1
+  elastic_instance_minimum     = 1
 }
