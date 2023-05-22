@@ -205,7 +205,11 @@ export default {
       this.apis = [];
     },
     addApiToProduct(api: Api) {
-      this.selectedApis.push(api);
+      if (!this.selectedApis.some(item => item.id == api.id)) {
+        this.selectedApis.push(api);
+      } else {
+        alert("This API is already a part of the Product. Please select another API.");
+      }
     },
     removeSelectedApi(index: number) {
       this.selectedApis.splice(index, 1);
