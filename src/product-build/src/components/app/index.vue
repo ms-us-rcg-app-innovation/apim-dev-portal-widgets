@@ -18,10 +18,7 @@
 
     <div class="column">
       <div class="cards" v-if="selectedProduct == null">
-        <div class="cards-body" v-if="working">
-          working...
-        </div>
-        <div class="cards-body animation-fade-in" v-else>
+        <div class="cards-body animation-fade-in">
           <h2>Products</h2>
           <a v-if="filteredProducts.length > 0" v-for="product in filteredProducts">
             <div class="card item-tile">
@@ -30,7 +27,7 @@
               </h3>
               <div class="tile line-clamp">
                 <p class="tile-content" v-html="product.description"></p>
-                <p v-if="!product.isBase && editingProduct == null">
+                <p v-if="!product.isBase">
                   <a href="#" v-on:click.self="deleteProduct(product)" class="button button-delete button-small">Delete</a>
                 </p>
               </div>
@@ -41,10 +38,7 @@
       </div>
 
       <div class="cards" v-if="selectedProduct != null">
-        <div class="cards-body" v-if="working">
-          working...
-        </div>
-        <div class="cards-body animation-fade-in" v-else>
+        <div class="cards-body animation-fade-in">
           <h2>{{ selectedProduct.displayName }} APIs</h2>
           <div v-if="apis.length > 0">
             <div v-for="api in apis">
@@ -70,8 +64,7 @@
     </div>
 
     <div class="column">
-      <h2 v-if="editingProduct">{{ editingProduct.displayName }} APIs</h2>
-      <h2 v-else>New Product APIs</h2>
+      <h2>New Product APIs</h2>
       <div v-if="selectedApis.length">
         <div v-for="(api, index) in selectedApis">
           <div class="card item-tile">
@@ -120,10 +113,8 @@ export default {
       apis: [] as Api[],
       selectedApis: [] as Api[],
       searchPattern: "" as String,
-      working: false,
       loading: false,
       selectedProduct: null as Product | null,
-      editingProduct: null as Product | null,
       productName: "" as string,
       productDescription: "" as string,
       settings: {} as Values,
@@ -136,7 +127,7 @@ export default {
 
   watch: {
     "selectedApis": function (val) {
-      if (val && val.length && !this.editingProduct && this.productName == "" && this.productDescription == "") {
+      if (val && val.length && this.productName == "" && this.productDescription == "") {
         this.productName = this.settings.productNamePlaceholder;
         this.productDescription = this.settings.productDescriptionPlaceholder;
       }
@@ -216,7 +207,6 @@ export default {
     },
     clear() {
       this.selectedApis = [];
-      this.editingProduct = null;
       this.productName = "";
       this.productDescription = "";
       this.clearProduct();
@@ -225,7 +215,6 @@ export default {
       this.clear();
       await this.loadProducts();
     },
-
     async createProduct() : Promise<void> {
       if (!this.selectedApis.length) {
         return;
@@ -246,8 +235,6 @@ export default {
      
       await this.refresh();
     },
-
-  
     async deleteProduct(product: Product) : Promise<void> {
       try {
         this.loading = true;
