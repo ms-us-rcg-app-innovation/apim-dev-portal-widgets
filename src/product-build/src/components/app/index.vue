@@ -4,9 +4,7 @@
   <div v-if="!loading" class="height-fill">
     <div class="form-inline max-w-500">
     <input type="search" class="form-control form-control-light" aria-label="Search" placeholder="Search products" spellcheck="false" v-model="searchPattern" />
-
       <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
-
       <div v-if="settings.debugModeEnabled">
         <h3>Temp Debugging Only</h3>
         <ul>
