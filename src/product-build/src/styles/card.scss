@@ -1,18 +1,17 @@
 .card.item-tile {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 3em;
+    margin-right: 3em;
 }
 
 .card {
-    border-top: none;
     box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.12549019607843137);
-    margin: 10px;
+    margin: 15px;
     padding: 10px;
-    padding-top: 5px;
+    padding-top: 1px;
     text-align: left;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
+    border-style: solid;
+    border-color: grey;
+    border-width: 1px;
 }
 
 .card {

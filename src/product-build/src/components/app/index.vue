@@ -236,6 +236,10 @@ export default {
       await this.refresh();
     },
     async deleteProduct(product: Product) : Promise<void> {
+      if (!confirm("Are you sure you want to delete this Product?")) {
+        return;
+      }
+
       try {
         this.loading = true;
         await this.getProductService().deleteProduct(product.id!)
