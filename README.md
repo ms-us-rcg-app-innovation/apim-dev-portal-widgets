@@ -1,23 +1,15 @@
 <!-- ABOUT THE PROJECT -->
-# About The Project
+# APIM Developer Portal Widgets
 
-## Contents
+This repository holds source code and documentation on Custom Widgets designed to be registered and execute with the APIM Developer Portal. 
+
+## Widgets
+
+| Widget    | Description |
+| --------- | ----------- |
+| [Product Build](src/product-build) | Interface for Developers to build and create their own Products |
 
 ## Core Prerequisites
-
-## Installation
-
-## Addons
-
-## Security
-
-## Testing
-
-## Retail Materials
-
-## Architecture
-
-## Solution Components
 
 ### Trademarks
 

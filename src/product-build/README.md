@@ -9,6 +9,7 @@ See [documentation](https://learn.microsoft.com/en-us/azure/api-management/devel
 ### Install Dependencies
 
 * Install [Node JS Runtime](https://nodejs.org/en/)
+* Install [Python](https://www.python.org/downloads/) (for backend Azure Function)
 * Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
 ### Establish Environment Variables
@@ -32,7 +33,11 @@ npm start
 
 ## Deployment
 
-### Deploy Manually
+### Deploy API Azure Function
+
+TODO
+
+### Deploy Widget Manually
 Establish environment variables referenced above and run the following command:
 
 ```powershell
@@ -49,7 +54,7 @@ async function getAccessToken(managementApiEndpoint) {
     return `Bearer ${token}`;
 }
 ```
-### Deploy Via CI/CD
+### Deploy Widget Via CI/CD
 
 TODO
 
