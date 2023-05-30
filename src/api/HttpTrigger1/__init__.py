@@ -454,7 +454,7 @@ def delete_product(productId: str, userid: str) -> HttpResponse:
 
     # Send a DELETE request to remove the product
     response = requests.delete(product_endpoint, headers=headers)
-    print("lol1")
+
     # If the product was successfully deleted, the response status code will be 200
     if response.status_code == 200:
         return HttpResponse(

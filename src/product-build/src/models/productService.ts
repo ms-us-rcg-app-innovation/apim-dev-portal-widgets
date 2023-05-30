@@ -45,7 +45,7 @@ export class ProductService {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to get list of Products");
+            throw new Error("Failed to get list of Products.");
         }
 
         let responseProductJson: Product[] = await response.json();
@@ -71,7 +71,7 @@ export class ProductService {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to get list of Apis");
+            throw new Error("Failed to get list of APIs.");
         }
 
         let responseApiJson: Api[] = await response.json();
@@ -97,7 +97,7 @@ export class ProductService {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to save Product");
+            throw new Error("Failed to save Product.");
         }
 
         let responseJson: SaveProductResponse = await response.json();
@@ -113,7 +113,7 @@ export class ProductService {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to get list of Apis");
+            throw new Error("Failed to delete Product.");
         }
     }
 }
