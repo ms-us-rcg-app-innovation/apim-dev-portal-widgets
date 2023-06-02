@@ -33,7 +33,7 @@
               </div>
             </div>
           </a>
-          <p v-else>No products found</p>
+          <p v-else>No products found.</p>
         </div>
       </div>
 
@@ -57,7 +57,7 @@
             </div>
           </div>
           <div v-else>
-            <p>No APIs found</p>
+            <p>No APIs found.</p>
           </div>
         </div>
       </div>

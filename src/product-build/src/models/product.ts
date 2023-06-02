@@ -1,4 +1,5 @@
 import { Api } from "./api"
+
 export class Product {
     public id?: string;
     public name?: string;
