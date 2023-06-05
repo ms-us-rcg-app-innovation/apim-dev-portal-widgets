@@ -96,7 +96,9 @@
       </div>
     </div>
   </div>
-  <div v-else class="loading"></div>
+  <div v-else>
+    <Spinner />
+  </div>
 </template>
 
 <script lang="ts">
@@ -105,8 +107,13 @@ import { Values, valuesDefault } from "../../values"
 import { Product } from "../../models/product";
 import { Api } from "../../models/api";
 import { ProductService } from "../../models/productService";
+import Spinner from "../spinner/index.vue"
 
 export default {
+  components: {
+    Spinner
+  },
+
   data() {
     return {
       products: [] as Product[],
