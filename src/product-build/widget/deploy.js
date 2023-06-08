@@ -1,4 +1,4 @@
-const { deployNodeJS } = require("@azure/api-management-custom-widgets-tools");
+const {deployNodeJS} = require("@azure/api-management-custom-widgets-tools")
 
 const serviceInformation = {
 	"resourceId": process.env.APIM_ID,

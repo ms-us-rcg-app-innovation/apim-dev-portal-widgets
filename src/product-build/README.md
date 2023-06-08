@@ -8,9 +8,11 @@ See [documentation](https://learn.microsoft.com/en-us/azure/api-management/devel
 
 ### Establish Resources
 
+#### Existing APIM Instance
 Provision an instance of Azure API Management and ensure User has Contributor permissions on the APIM Resource. Also provision an Azure Function application targeting Python. In the APIM instance, make note of the full Resource Id, and launch the Developer Portal and make note of the URL.
 
-TODO - provide terraform for establishing these resources.
+#### Provision New Resources
+Use [provided terraform resources and instructions](./infrastructure/terraform/) to provision APIM and Azure Function.
 
 ### Provision Custom Widget
 
@@ -55,12 +57,11 @@ py -m pip install -r requirements.txt
 func start
 ```
 
-
 ## Deployment
 
 ### Deploy API Azure Function
 
-TODO
+The [api directory](./api/) Azure Function runs on Python and is used for querying APIM Management utilities specifically to manage Products and APIs. See [documentation for deploying Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-deployment-technologies).
 
 ### Deploy Widget Manually
 Establish environment variables referenced above and run the following command:
@@ -81,7 +82,7 @@ async function getAccessToken(managementApiEndpoint) {
 ```
 ### Deploy Widget Via CI/CD
 
-TODO
+Coming Soon - TODO
 
 ### Trademarks
 
