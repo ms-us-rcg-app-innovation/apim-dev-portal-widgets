@@ -7,7 +7,7 @@ This repository holds source code and documentation on Custom Widgets designed t
 
 | Widget    | Description |
 | --------- | ----------- |
-| [Product Build](src/product-build) | Interface for Developers to build and create their own Products |
+| [Product Build](./widgets/product-build/) | Interface for Developers to build and create their own Products |
 
 ## Core Prerequisites
 

@@ -1,6 +1,6 @@
 <!-- ABOUT THE PROJECT -->
 # Product Build Widget
-Custom VueJS widget designed to allow the Developer/Consumer to build custom Products within the APIM instance by searching for existing canned/base Products, selecting one or more APIs, and constructing a brand new Product accessible only by said User.
+[Custom VueJS widget](./src/widget/) designed to allow the Developer/Consumer to build custom Products within the APIM instance by searching for existing canned/base Products, selecting one or more APIs, and constructing a brand new Product accessible only by said User.
 
 See [documentation](https://learn.microsoft.com/en-us/azure/api-management/developer-portal-extend-custom-functionality#create-and-upload-custom-widget) for more details on custom widgets for the APIM Developer Portal.
 
@@ -42,7 +42,7 @@ $env:APIM_DEV_PORTAL_LOCALHOST_PORT = 3000;
 ### Widget
 
 ```powershell
-cd widget
+cd src/widget
 
 npm install
 npm start
@@ -51,7 +51,7 @@ npm start
 ### API
 
 ```powershell
-cd api
+cd src/api
 py -m pip install -r requirements.txt
 
 func start
@@ -61,7 +61,7 @@ func start
 
 ### Deploy API Azure Function
 
-The [api directory](./api/) Azure Function runs on Python and is used for querying APIM Management utilities specifically to manage Products and APIs. See [documentation for deploying Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-deployment-technologies).
+The [api directory](./src/api/) Azure Function runs on Python and is used for querying APIM Management utilities specifically to manage Products and APIs. See [documentation for deploying Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-deployment-technologies).
 
 ### Deploy Widget Manually
 Establish environment variables referenced above and run the following command:
