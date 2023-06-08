@@ -32,7 +32,7 @@ resource "azurerm_resource_group" "apim" {
 }
 
 module "apim" {
-  source              = "./modules/apim"
+  source              = "../../../../infrastructure/terraform/modules/apim"
   apim_name           = local.apim_name
   resource_group_name = local.resource_group_name
   location            = var.location
@@ -43,7 +43,7 @@ module "apim" {
 }
 
 module "widget_func" {
-  source              = "./modules/function"
+  source              = "./modules/py-function"
   app_name            = local.widget_func_name
   resource_group_name = local.resource_group_name
   location            = var.location

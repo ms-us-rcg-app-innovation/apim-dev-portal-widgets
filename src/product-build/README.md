@@ -8,9 +8,11 @@ See [documentation](https://learn.microsoft.com/en-us/azure/api-management/devel
 
 ### Establish Resources
 
+#### Existing APIM Instance
 Provision an instance of Azure API Management and ensure User has Contributor permissions on the APIM Resource. Also provision an Azure Function application targeting Python. In the APIM instance, make note of the full Resource Id, and launch the Developer Portal and make note of the URL.
 
-TODO - provide terraform for establishing these resources.
+#### Provision New Resources
+Use [provided terraform resources and instructions](./infrastructure/terraform/ReadMe.md) to provision APIM and Azure Function.
 
 ### Provision Custom Widget
 
