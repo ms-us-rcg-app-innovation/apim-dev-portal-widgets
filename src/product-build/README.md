@@ -37,12 +37,24 @@ $env:APIM_DEV_PORTAL_LOCALHOST_PORT = 3000;
 
 ## Local Development
 
+### Widget
+
 ```powershell
 cd widget
 
 npm install
 npm start
 ```
+
+### API
+
+```powershell
+cd api
+py -m pip install -r requirements.txt
+
+func start
+```
+
 
 ## Deployment
 

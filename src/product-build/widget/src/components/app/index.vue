@@ -142,7 +142,7 @@ export default {
   },
 
   async mounted(): Promise<void> {
-    const editorData = getValues(valuesDefault)
+    const editorData = getValues(valuesDefault);
 
     this.settings.endpoint = editorData.endpoint;
     this.settings.baseProductTag = editorData.baseProductTag;
