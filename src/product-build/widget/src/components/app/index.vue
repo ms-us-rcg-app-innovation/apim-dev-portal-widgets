@@ -33,7 +33,7 @@
               </div>
             </div>
           </a>
-          <p v-else>No products found</p>
+          <p v-else>No products found.</p>
         </div>
       </div>
 
@@ -57,7 +57,7 @@
             </div>
           </div>
           <div v-else>
-            <p>No APIs found</p>
+            <p>No APIs found.</p>
           </div>
         </div>
       </div>
@@ -96,7 +96,9 @@
       </div>
     </div>
   </div>
-  <div v-else class="loading"></div>
+  <div v-else>
+    <Spinner />
+  </div>
 </template>
 
 <script lang="ts">
@@ -105,8 +107,13 @@ import { Values, valuesDefault } from "../../values"
 import { Product } from "../../models/product";
 import { Api } from "../../models/api";
 import { ProductService } from "../../models/productService";
+import Spinner from "../spinner/index.vue"
 
 export default {
+  components: {
+    Spinner
+  },
+
   data() {
     return {
       products: [] as Product[],
@@ -135,7 +142,7 @@ export default {
   },
 
   async mounted(): Promise<void> {
-    const editorData = getValues(valuesDefault)
+    const editorData = getValues(valuesDefault);
 
     this.settings.endpoint = editorData.endpoint;
     this.settings.baseProductTag = editorData.baseProductTag;

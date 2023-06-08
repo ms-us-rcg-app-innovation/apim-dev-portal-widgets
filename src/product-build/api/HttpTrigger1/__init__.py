@@ -3,12 +3,10 @@ import json
 import datetime
 from typing import Optional
 import uuid
-import jwt
 import requests
 from azure.identity import ClientSecretCredential
 from azure.functions import HttpRequest, HttpResponse
 from azure.identity import DefaultAzureCredential
-
 
 import azure.functions as func
 
@@ -16,7 +14,6 @@ import azure.functions as func
 subscriptionId = "2e926ce6-8aad-455c-b48b-7203d9a34b27"
 resourceGroupName = "apim-custom-portal"
 serviceName = "custom-portal"
-
 
 credential = DefaultAzureCredential()
 
@@ -447,7 +444,7 @@ def create_or_update_product(productId: Optional[str], productApis: str, userid:
 def delete_product(productId: str, userid: str) -> HttpResponse:
     headers = create_headers()
 
-
+    # NOTE: productId is in format /products/{productId}
 
     # Define the endpoint for deleting the product
     product_endpoint = f"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}{productId}?api-version=2022-08-01&deleteSubscriptions=true"

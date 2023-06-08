@@ -16,7 +16,6 @@ TODO - provide terraform for establishing these resources.
 
 Log into the Azure portal with a user that has at least Contributor permissions on the APIM resource. On the APIM resource, under Developer Portal, select Portal Overview > Developer portal. This launches the Developer Portal in edit/management mode. Once in edit mode, select Custom Widgets from the side bar and follow the prompts to register a new Custom Widget. Call this widget "Product: Build" or something similar. 
 
-
 For more information on establishing a new Custom Widget in the developer portal, please see the [documentation](https://learn.microsoft.com/en-us/azure/api-management/developer-portal-extend-custom-functionality#create-widget).
 
 ### Install Dependencies
@@ -38,10 +37,24 @@ $env:APIM_DEV_PORTAL_LOCALHOST_PORT = 3000;
 
 ## Local Development
 
+### Widget
+
 ```powershell
+cd widget
+
 npm install
 npm start
 ```
+
+### API
+
+```powershell
+cd api
+py -m pip install -r requirements.txt
+
+func start
+```
+
 
 ## Deployment
 
