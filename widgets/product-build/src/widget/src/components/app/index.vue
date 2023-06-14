@@ -5,13 +5,6 @@
     <div class="form-inline max-w-500">
     <input type="search" class="form-control form-control-light" aria-label="Search" placeholder="Search products" spellcheck="false" v-model="searchPattern" />
       <p>Select a Product to view APIs. Select one or more APIs to build a Product.</p>
-      <div v-if="settings.debugModeEnabled">
-        <h3>Temp Debugging Only</h3>
-        <ul>
-          <li>UserId: {{ userId  }}</li>
-          <li>SAS Token: {{ accessToken }}</li>
-        </ul>
-      </div>
     </div>
 
     <div style="clear:both"></div>
@@ -172,7 +165,7 @@ export default {
     this.userId = secrets.userId;
 
     if (this.settings.debugModeEnabled) {
-      console.log("token", this.accessToken);
+      console.log("sas_token", this.accessToken);
       console.log("userId", this.userId);
     }
 
