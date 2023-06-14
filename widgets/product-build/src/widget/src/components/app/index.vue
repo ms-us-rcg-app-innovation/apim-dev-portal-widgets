@@ -53,9 +53,20 @@
                 </div>
               </div>
             </div>
-            <h3>Subscription Keys</h3>
-            <input type="text" class="form-control" v-model="selectedProduct.subscriptionKeys[0]"/>
-            <input type="text" class="form-control" v-model="selectedProduct.subscriptionKeys[1]"/>
+            <div v-if="subscriptionKeysEnabled">
+              <a href="#" v-on:click.prevent="showSubscriptionKeys = !showSubscriptionKeys">{{ showSubscriptionKeys ? "Hide Subscription Keys" : "Show Subscription Keys" }}</a>
+            </div>
+            <div v-if="subscriptionKeysEnabled && showSubscriptionKeys" class="form">
+              <h3>Subscription Keys</h3>
+              <div class="form-group">
+                <label for="subscription-primary-key" class="form-label">Primary Key</label>
+                <input id="subscription-primary-key" type="text" class="form-control" v-model="selectedProduct.subscriptionKeys[0]"/>
+              </div>
+              <div class="form-group">
+                <label for="subscription-secondary-key" class="form-label">Secondary Key</label>
+                <input id="subscription-secondary-key" type="text" class="form-control" v-model="selectedProduct.subscriptionKeys[1]"/>
+              </div>
+            </div>
             <div class="button-group-center">
               <a href="#" v-on:click.prevent="clearProduct()" class="button button-small button-cancel">Back to Products</a>
             </div>
@@ -127,6 +138,7 @@ export default {
       searchPattern: "" as String,
       loading: false,
       selectedProduct: null as Product | null,
+      showSubscriptionKeys: false,
       productName: "" as string,
       productDescription: "" as string,
       settings: {} as Values,
@@ -175,6 +187,10 @@ export default {
       }
 
       return this.products.filter(p => p.displayName?.toLowerCase().includes(pattern) || p.description?.toLowerCase().includes(pattern));
+    },
+    subscriptionKeysEnabled(): boolean {
+      return this.selectedProduct != null && !this.selectedProduct.isBase 
+          && this.selectedProduct.subscriptionKeys && this.selectedProduct.subscriptionKeys.length > 0;
     }
   },
 
@@ -206,6 +222,7 @@ export default {
     },
     clearProduct() {
       this.selectedProduct = null;
+      this.showSubscriptionKeys = false;
       this.apis = [];
     },
     addApiToProduct(api: Api) {
