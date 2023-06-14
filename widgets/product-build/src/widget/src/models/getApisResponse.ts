@@ -3,4 +3,5 @@ import { Api } from "./api";
 
 export class GetApisResponse extends ResponseBase {
     public apis?: Api[]
+    public keys?: string[]
 }

@@ -125,9 +125,6 @@ def verify_user(auth_header):
     endpoint = f"https://custom-portal.management.azure-api.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identity?api-version=2022-08-01"
     response = requests.get(endpoint, headers=headers)
 
-    print(response.status_code)
-    print(endpoint)
-
     if response.status_code != 200:
         return "invalid"
     elif response.status_code == 200:
@@ -339,6 +336,9 @@ def list_apis_of_products(productIds: str) -> HttpResponse:
     headers = create_headers()
     all_apis = []
     productIds = productIds.split(',')
+    subscriptions = []
+    responseObj = { "apis": [], "keys": [] }
+
 
     for productId in productIds:
         # Define  API Management REST endpoint for listing APIs of the product
@@ -346,7 +346,7 @@ def list_apis_of_products(productIds: str) -> HttpResponse:
 
         # Send a GET request to retrieve the APIs
         apis_response = requests.get(apis_endpoint, headers=headers)
-
+        
         if apis_response.status_code != 200:
             return HttpResponse(
                 json.dumps({"error": apis_response.text}),
@@ -356,8 +356,41 @@ def list_apis_of_products(productIds: str) -> HttpResponse:
         # Assuming the APIs are in the 'value' field of the response
         all_apis.extend(apis_response.json().get('value', []))
 
+        responseObj["apis"] = all_apis
+
+        subscriptions_endpoint = f'https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}{productId}/subscriptions?api-version=2022-08-01'
+        subscriptions_response = requests.get(subscriptions_endpoint, headers=headers)
+        
+        if subscriptions_response.status_code not in [200, 201]:
+            return HttpResponse(
+                json.dumps({"error": apis_response.text}),
+                status_code=400
+            )
+        
+        # Assuming the subscriptions are in the 'value' field of the response
+        subscriptions.extend(subscriptions_response.json().get('value', []))
+        apimSubscriptionId = ""
+
+        # get the subscriptionId, which is the last part of the id field
+        # NOTE: the "productId" is part of the id field and causes issues
+        #       when looking up the subscription keys
+        if subscriptions:
+            apimSubscriptionId = subscriptions[0]['id']
+            apimSubscriptionId = apimSubscriptionId.replace(productId, "")
+
+        # if apimsubscriptionId is not empty, then get the subscription keys
+        if apimSubscriptionId:
+            keys_endpoint = f'https://management.azure.com{apimSubscriptionId}/listSecrets?api-version=2022-08-01'
+            keys_response = requests.post(keys_endpoint, headers=headers)
+            
+            if keys_response.status_code in [200, 201]:
+                # Assuming the subscription keys are in the 'value' field of the response
+                subscriptionKeys = keys_response.json()
+                responseObj["keys"].append(subscriptionKeys["primaryKey"])
+                responseObj["keys"].append(subscriptionKeys["secondaryKey"])
+
     return HttpResponse(
-        json.dumps(all_apis),
+        json.dumps(responseObj),
         headers={"Content-Type": "application/json"}
     )
 

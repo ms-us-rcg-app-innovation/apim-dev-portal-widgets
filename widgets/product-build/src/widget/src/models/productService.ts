@@ -74,18 +74,17 @@ export class ProductService {
             throw new Error("Failed to get list of APIs.");
         }
 
-        let responseApiJson: Api[] = await response.json();
+        let responseApiJson: GetApisResponse = await response.json();
 
-        for (let i = 0; i < responseApiJson.length; i++) {
-            if (!responseApiJson[i].displayName && responseApiJson[i].name) {
-                responseApiJson[i].displayName = responseApiJson[i].name;
+        if (responseApiJson.apis) {
+            for (let i = 0; i < responseApiJson.apis?.length; i++) {
+                if (!responseApiJson.apis[i].displayName && responseApiJson.apis[i].name) {
+                    responseApiJson.apis[i].displayName = responseApiJson.apis[i].name;
+                }
             }
         }
 
-        let apiResponse =  new GetApisResponse();
-        apiResponse.apis = responseApiJson;
-
-        return apiResponse;
+        return responseApiJson;
     }
 
     public async saveProduct(product: Product): Promise<SaveProductResponse> {

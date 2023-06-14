@@ -8,6 +8,7 @@ export class Product {
 
     public apiIds: string = "";
     public isBase: boolean = true;
+    public subscriptionKeys: string[] = [];
 
     public setApiIds(apis: Api[])
     {

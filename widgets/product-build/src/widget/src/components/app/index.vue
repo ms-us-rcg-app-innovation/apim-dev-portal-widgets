@@ -39,7 +39,8 @@
 
       <div class="cards" v-if="selectedProduct != null">
         <div class="cards-body animation-fade-in">
-          <h2>{{ selectedProduct.displayName }} APIs</h2>
+          <h2>{{ selectedProduct.displayName }}</h2>
+          <h3>APIs</h3>
           <div v-if="apis.length > 0">
             <div v-for="api in apis">
               <div class="card item-tile">
@@ -52,6 +53,9 @@
                 </div>
               </div>
             </div>
+            <h3>Subscription Keys</h3>
+            <input type="text" class="form-control" v-model="selectedProduct.subscriptionKeys[0]"/>
+            <input type="text" class="form-control" v-model="selectedProduct.subscriptionKeys[1]"/>
             <div class="button-group-center">
               <a href="#" v-on:click.prevent="clearProduct()" class="button button-small button-cancel">Back to Products</a>
             </div>
@@ -59,6 +63,7 @@
           <div v-else>
             <p>No APIs found.</p>
           </div>
+
         </div>
       </div>
     </div>
@@ -192,6 +197,7 @@ export default {
         var response = await this.getProductService().getApis(product.id!);
 
         this.selectedProduct = product;
+        this.selectedProduct.subscriptionKeys = response.keys ?? [];
         this.apis = response.apis ?? [];
       } finally {
         this.loading = false;
