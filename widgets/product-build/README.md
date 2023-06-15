@@ -16,7 +16,7 @@ Manually provision or use existing resources:
 
 * Azure API Management instance and ensure User has Contributor permissions to said instance
 * Azure Function targeting Python. 
-* Managed Identity for the Azure Function with Contributor access to the APIM instance
+* [Managed Identity](https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=portal%2Chttp) for the Azure Function with Contributor access to the APIM instance
 
 ### Establish Resource Prerequisites
 
