@@ -1,8 +1,13 @@
 # Provisioning
 
+## Install Prerequisites
+
+* Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+* Install [terraform](https://developer.hashicorp.com/terraform/downloads?ajs_aid=e7cb18f6-0e91-46ef-b3af-d22a83181326&product_intent=terraform)
+
 ## Bootstrap terraform by creating support infrastructure
 
-Login to the azure cli
+Login to the Azure CLI
 
 ```
 az login

@@ -4,16 +4,16 @@ import datetime
 from typing import Optional
 import uuid
 import requests
+import os
 from azure.identity import ClientSecretCredential
 from azure.functions import HttpRequest, HttpResponse
 from azure.identity import DefaultAzureCredential
 
 import azure.functions as func
 
-# Define  Azure subscription ID, resource group name, and API Management service name
-subscriptionId = "2e926ce6-8aad-455c-b48b-7203d9a34b27"
-resourceGroupName = "apim-custom-portal"
-serviceName = "custom-portal"
+subscriptionId = os.environ["APIM_SUBSCRIPTION_ID"]
+resourceGroupName = os.environ["APIM_RESOURCE_GROUP_NAME"]
+serviceName = os.environ["APIM_SERVICE_NAME"]
 
 credential = DefaultAzureCredential()
 
@@ -83,7 +83,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if req.method == "POST" and route == "create_product":
         productId = req.params.get('productId')
         productApis = req.params.get('productApis')
-
 
         if productApis is None:
             return func.HttpResponse(

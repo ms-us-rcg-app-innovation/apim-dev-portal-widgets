@@ -1,18 +1,32 @@
-<!-- ABOUT THE PROJECT -->
 # Product Build Widget
+
 [Custom VueJS widget](./src/widget/) designed to allow the Developer/Consumer to build custom Products within the APIM instance by searching for existing canned/base Products, selecting one or more APIs, and constructing a brand new Product accessible only by said User.
 
 See [documentation](https://learn.microsoft.com/en-us/azure/api-management/developer-portal-extend-custom-functionality#create-and-upload-custom-widget) for more details on custom widgets for the APIM Developer Portal.
 
 ## Core Prerequisites
 
-### Establish Resources
+### Provision Resources
 
-#### Existing APIM Instance
-Provision an instance of Azure API Management and ensure User has Contributor permissions on the APIM Resource. Also provision an Azure Function application targeting Python. In the APIM instance, make note of the full Resource Id, and launch the Developer Portal and make note of the URL.
+Use [provided Terraform resources and instructions](./infrastructure/terraform/) to provision the required Resources including APIM and an Azure Function.
 
-#### Provision New Resources
-Use [provided terraform resources and instructions](./infrastructure/terraform/) to provision APIM and Azure Function.
+OR 
+
+Manually provision or use existing resources:
+
+* Azure API Management instance and ensure User has Contributor permissions to said instance
+* Azure Function targeting Python. 
+* Managed Identity for the Azure Function with Contributor access to the APIM instance
+
+### Establish Resource Prerequisites
+
+For the APIM instance, make note of the full Resource Id under the JSON View, and launch the Developer Portal and make note of the URL. Also note the Subscription Id, Resource Group Name, and APIM name.
+
+For the Azure Function, ensure the following Application Setting values are set:
+
+* APIM_SUBSCRIPTION_ID
+* APIM_RESOURCE_GROUP_NAME
+* APIM_SERVICE_NAME
 
 ### Provision Custom Widget
 
@@ -31,6 +45,9 @@ For more information on establishing a new Custom Widget in the developer portal
 ```powershell
 $env:APIM_ID = "<APIM Resource Id>";
 $env:APIM_DEV_PORTAL_URL = "<APIM Developer Portal Url>";
+$env:APIM_SUBSCRIPTION_ID = "<APIM Subscription Id>";
+$env:APIM_RESOURCE_GROUP_NAME = "<APIM Resource Group Name>";
+$env:APIM_SERVICE_NAME = "<APIM Name>";
 
 # Optional variables
 $env:APIM_ENDPOINT = "https://management.azure.com";
@@ -42,7 +59,7 @@ $env:APIM_DEV_PORTAL_LOCALHOST_PORT = 3000;
 ### Widget
 
 ```powershell
-cd src/widget
+cd widgets/product-build/src/widget
 
 npm install
 npm start
@@ -51,7 +68,7 @@ npm start
 ### API
 
 ```powershell
-cd src/api
+cd widgets/product-build/src/api
 py -m pip install -r requirements.txt
 
 func start
