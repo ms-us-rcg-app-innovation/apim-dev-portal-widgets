@@ -10,6 +10,10 @@ export class SaveProductRequest extends RequestBase {
     }
 
     get path() {
-        return `/create_product?productApis=${this.product.apiIds}`;
+        return `/create_product`;
     } 
+
+    get body() {
+        return JSON.stringify(this.product);
+    }
 }

@@ -3,7 +3,6 @@ import { GetProductsResponse } from "./getProductsResponse"
 import { GetApisRequest } from "./getApisRequest"
 import { GetApisResponse } from "./getApisResponse"
 import { Product } from "./product"
-import { Api } from "./api"
 import { SaveProductRequest } from "./saveProductRequest"
 import { SaveProductResponse } from "./saveProductResponse"
 import { DeleteProductRequest } from "./deleteProductRequest"
@@ -92,7 +91,8 @@ export class ProductService {
 
         let response = await fetch(`${this.endpoint}${request.path}`, {
             method: "POST",
-            headers: request.headers
+            headers: request.headers,
+            body: request.body
         });
 
         if (!response.ok) {

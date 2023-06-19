@@ -1,4 +1,3 @@
-<!-- ABOUT THE PROJECT -->
 # APIM Developer Portal Widgets
 
 This repository holds source code and documentation on Custom Widgets designed to be registered and execute with the APIM Developer Portal. 

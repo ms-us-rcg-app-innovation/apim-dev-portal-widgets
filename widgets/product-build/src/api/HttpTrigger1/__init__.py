@@ -2,18 +2,17 @@ import logging
 import json
 import datetime
 from typing import Optional
-import uuid
 import requests
-from azure.identity import ClientSecretCredential
+import os
 from azure.functions import HttpRequest, HttpResponse
 from azure.identity import DefaultAzureCredential
+from .models import Product
 
 import azure.functions as func
 
-# Define  Azure subscription ID, resource group name, and API Management service name
-subscriptionId = "2e926ce6-8aad-455c-b48b-7203d9a34b27"
-resourceGroupName = "apim-custom-portal"
-serviceName = "custom-portal"
+subscriptionId = os.environ["APIM_SUBSCRIPTION_ID"]
+resourceGroupName = os.environ["APIM_RESOURCE_GROUP_NAME"]
+serviceName = os.environ["APIM_SERVICE_NAME"]
 
 credential = DefaultAzureCredential()
 
@@ -81,17 +80,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return delete_product(productId,userid)
         
     if req.method == "POST" and route == "create_product":
-        productId = req.params.get('productId')
-        productApis = req.params.get('productApis')
+        try:
+            body = req.get_json()
+            product = Product(body["name"], body["description"], body["apiIds"])
 
-
-        if productApis is None:
+            return create_product(product,userid)
+        except:
             return func.HttpResponse(
-                "Please pass a list of productApis on the query string or in the request body example: /subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.ApiManagement/service/apimName/products/testbaseproduct1/apis/testapi1",
+                "Please pass a valid product object in the request body",
                 status_code=400
             )
-        else:
-            return create_or_update_product(productId, productApis, userid)
 
     if req.method == "POST" and route == "check_and_create_tag":
         tagId = req.params.get('tagId')
@@ -100,8 +98,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "Please pass a tagId on the query string or in the request body",
                 status_code=400
             )
-        else:
-            return check_and_create_tag(tagId)
 
     return HttpResponse(
         json.dumps({"error": "Invalid request"}),
@@ -394,7 +390,7 @@ def list_apis_of_products(productIds: str) -> HttpResponse:
         headers={"Content-Type": "application/json"}
     )
 
-def create_or_update_product(productId: Optional[str], productApis: str, userid: str) -> HttpResponse:
+def create_product(product: Product, userid: str) -> HttpResponse:
     headers = create_headers()
 
     # Hardcoded tag
@@ -408,11 +404,7 @@ def create_or_update_product(productId: Optional[str], productApis: str, userid:
             status_code=400
         )
     
-    if productId is None:
-        # If productId is not provided, generate a random productId for the new product
-        productId = f"product-{str(uuid.uuid4())[:5]}"
-
-
+    productId = product.generateId()
 
     # Define the endpoint for creating or updating the product
     product_endpoint = f"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}?api-version=2022-08-01"
@@ -420,8 +412,8 @@ def create_or_update_product(productId: Optional[str], productApis: str, userid:
     # Send a PUT request to create or update the product
     body = {
         "properties": {
-            "displayName": productId,
-            "description": "This is a new product.",
+            "displayName": product.name,
+            "description": product.description,
             "terms": "Terms for the new product.",
             "subscriptionRequired": True,
             "approvalRequired": False,
@@ -441,7 +433,7 @@ def create_or_update_product(productId: Optional[str], productApis: str, userid:
         )
 
     # Split the comma-separated list of API IDs into individual IDs
-    apiIds = productApis.split(',')
+    apiIds = product.api_ids.split(',')
 
     # For each API ID, define the endpoint for adding the API to the product and send a PUT request
     for apiId in apiIds:
