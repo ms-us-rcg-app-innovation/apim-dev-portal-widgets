@@ -85,7 +85,7 @@
             </div>
           </div>
         </div>
-        <!-- <div class="form">
+        <div class="form">
           <div class="form-group">
             <label for="product-edit-name" class="form-label">Name</label>
             <input id="product-edit-name" type="text" class="form-control" v-model="productName" />
@@ -94,7 +94,7 @@
             <label for="product-edit-desc" class="form-label">Description</label>
             <input id="product-edit-desc" type="text" class="form-control" v-model="productDescription" />
           </div>
-        </div> -->
+        </div>
         <div class="button-group-center">
           <a href="#" v-on:click.prevent="createProduct()" class="button button-small">Create Product</a>
           <a href="#" v-on:click.prevent="clear()" class="button button-cancel button-small">Cancel</a>
@@ -244,7 +244,7 @@ export default {
       }
 
       var product = new Product();
-      product.displayName = this.productName!;
+      product.name = this.productName!;
       product.description = this.productDescription!;
       product.isBase = false;
       product.setApiIds(this.selectedApis);
