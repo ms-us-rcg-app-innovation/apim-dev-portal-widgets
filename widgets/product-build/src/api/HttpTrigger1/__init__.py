@@ -118,7 +118,7 @@ def verify_user(auth_header):
     }
 
     print(headers)
-    endpoint = f"https://custom-portal.management.azure-api.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identity?api-version=2022-08-01"
+    endpoint = f"https://{serviceName}.management.azure-api.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identity?api-version=2022-08-01"
     response = requests.get(endpoint, headers=headers)
 
     if response.status_code != 200:
