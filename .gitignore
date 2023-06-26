@@ -7,6 +7,7 @@ output/
 *.lock.hcl
 *.tfstate
 *.tfvars
+*.tfstate.backup
 
 .history/
 .vs/

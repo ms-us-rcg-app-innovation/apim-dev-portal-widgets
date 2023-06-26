@@ -8,7 +8,20 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+}
+
+data "azurerm_subscription" "current" {
+}
+
+resource "random_string" "suffix" {
+  length  = 5
+  special = false
+  upper   = false
 }
 
 locals {
@@ -34,7 +47,7 @@ resource "azurerm_resource_group" "apim" {
 module "apim" {
   source              = "../../../../infrastructure/terraform/modules/apim"
   apim_name           = local.apim_name
-  resource_group_name = local.resource_group_name
+  resource_group_name = azurerm_resource_group.apim.name
   location            = var.location
   publisher_name      = var.publisher_name
   publisher_email     = var.publisher_email
@@ -42,17 +55,27 @@ module "apim" {
   sku_count           = var.apim_sku_count
 }
 
+module "product" {
+  source              = "./modules/apim-product-example"
+  resource_group_name = azurerm_resource_group.apim.name
+  apim_resource_id    = module.apim.id
+  apim_name           = module.apim.name
+  suffix              = "tf"
+}
+
 module "widget_func" {
-  source              = "./modules/py-function"
-  app_name            = local.widget_func_name
-  resource_group_name = local.resource_group_name
-  location            = var.location
-  python_version      = "3.9"
+  source                 = "./modules/py-function"
+  app_name               = local.widget_func_name
+  service_plan_name      = "${local.widget_func_name}-asp"
+  resource_group_name    = azurerm_resource_group.apim.name
+  location               = var.location
+  python_version         = "3.9"
+  cors_allow_all_origins = var.cors_allow_all_origins
   app_settings = {
-    "FUNCTIONS_WORKER_RUNTIME" = "python"
+    "FUNCTIONS_WORKER_RUNTIME" = "python",
+    "APIM_SUBSCRIPTION_ID"     = data.azurerm_subscription.current.subscription_id,
+    "APIM_RESOURCE_GROUP_NAME" = azurerm_resource_group.apim.name,
+    "APIM_SERVICE_NAME"        = module.apim.name
   }
-  dotnet_version               = "6.0"
-  host_sku                     = "EP1"
-  maximum_elastic_worker_count = 1
-  elastic_instance_minimum     = 1
+  apim_resource_id = module.apim.id
 }

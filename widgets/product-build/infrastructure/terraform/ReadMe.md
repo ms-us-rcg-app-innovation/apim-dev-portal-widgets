@@ -1,4 +1,4 @@
-# Provisioning
+# Resource Provisioning Using Terraform
 
 ## Install Prerequisites
 
@@ -29,22 +29,23 @@ This action will create a "tfstate" resource group with an Azure Storage Account
 
 ## Create Azure Infrastructure
 
-Run terraform init and specify the backend configuration. For configuration details, see the [Terraform documentation](https://developer.hashicorp.com/terraform/language/settings/backends/azurerm).
+ First, define variables by creating a [terraform.tfvars](https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files) file in the terraform directory. See [variables to define](variables.tf) for details.
 
-```bash
+ Run terraform init and specify the backend configuration. For configuration details, see the [Terraform documentation](https://developer.hashicorp.com/terraform/language/settings/backends/azurerm).
+
+```powershell
 # run from terraform directory
-NAME="apimwidgetproductbuild"
-location="South Central US"
-ARM_RESOURCE_GROUP="${NAME}-tfstate"
-storage_account_name=      # tfstate resource group storage account
-container_name="tfstate"
-key="terraform.tfstate"
-ARM_ACCESS_KEY=            # tfstate resource group storage account access key
+$name="apimcw"
+$env:ARM_RESOURCE_GROUP="${name}-tfstate"
+$env:ARM_STORAGE_ACCOUNT_NAME=""    # tfstate resource group storage account
+$env:ARM_CONTAINER_NAME="tfstate"
+$env:ARM_KEY="terraform.tfstate"
+$env:ARM_ACCESS_KEY=""      # tfstate resource group storage account access key
 
-terraform init \
--backend-config "container_name=${container_name}" \
--backend-config "key=${key}" \
--backend-config "storage_account_name=${storage_account_name}"
+terraform init `
+-backend-config "container_name=$env:ARM_CONTAINER_NAME" `
+-backend-config "key=$env:ARM_KEY" `
+-backend-config "storage_account_name=$env:ARM_STORAGE_ACCOUNT_NAME"
 
 terraform plan
 terraform apply -auto-approve
