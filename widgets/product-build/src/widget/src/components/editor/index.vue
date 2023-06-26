@@ -11,7 +11,7 @@
       <input id="productDescPlaceholder" type="text" class="form-control" v-model="productDescriptionPlaceholder" :placeholder="valuesDefault.productDescriptionPlaceholder" />
     </div>
     <div class="form-group">
-      <label for="endpoint" class="form-label">Endpoint</label>
+      <label for="endpoint" class="form-label">API Endpoint</label>
       <input id="endpoint" type="text" class="form-control" v-model="endpoint" :placeholder="valuesDefault.endpoint" />
     </div>
     <div class="form-group">

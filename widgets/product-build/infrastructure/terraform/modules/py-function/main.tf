@@ -55,11 +55,16 @@ resource "azurerm_linux_function_app" "func" {
   identity {
     type = "SystemAssigned"
   }
+
+  cors {
+    support_credentials = !var.cors_allow_all_origins
+    allowed_origins     = var.cors_allow_all_origins ? ["*"] : []
+  }
 }
 
 # Grant function contributor role to resource
 resource "azurerm_role_assignment" "apim" {
-  scope                = var.resource_id
+  scope                = var.apim_resource_id
   role_definition_name = "Contributor"
   principal_id         = azurerm_linux_function_app.func.identity[0].principal_id
 }

@@ -6,21 +6,25 @@ See [documentation](https://learn.microsoft.com/en-us/azure/api-management/devel
 
 ## Core Prerequisites
 
-### Provision Resources
+### Install Dependencies
+
+* Install [Node JS Runtime](https://nodejs.org/en/)
+* Install [Python](https://www.python.org/downloads/) (for backend Azure Function)
+* Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+### Provision Resources via Terraform
 
 Use [provided Terraform resources and instructions](./infrastructure/terraform/) to provision the required Resources including APIM and an Azure Function.
 
-OR 
+### Provision Resources Manually
 
-Manually provision or use existing resources:
+If not using the Terraform Infrastructure as Code, manually provision or use existing resources:
 
 * Azure API Management instance and ensure User has Contributor permissions to said instance
 * Azure Function targeting Python. 
 * [Managed Identity](https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=portal%2Chttp) for the Azure Function with Contributor access to the APIM instance
-
-### Establish Resource Prerequisites
-
-For the APIM instance, make note of the full Resource Id under the JSON View, and launch the Developer Portal and make note of the URL. Also note the Subscription Id, Resource Group Name, and APIM name.
+* Establish at least one Product with at least one API
+* Establish API Tag and apply to the Product via the [az rest](https://learn.microsoft.com/en-us/cli/azure/reference-index?view=azure-cli-latest#az-rest) command calling the available [REST API](https://learn.microsoft.com/en-us/rest/api/apimanagement/current-ga/product-tag/assign-to-product?tabs=HTTP)
 
 For the Azure Function, ensure the following Application Setting values are set:
 
@@ -28,19 +32,9 @@ For the Azure Function, ensure the following Application Setting values are set:
 * APIM_RESOURCE_GROUP_NAME
 * APIM_SERVICE_NAME
 
-### Provision Custom Widget
-
-Log into the Azure portal with a user that has at least Contributor permissions on the APIM resource. On the APIM resource, under Developer Portal, select Portal Overview > Developer portal. This launches the Developer Portal in edit/management mode. Once in edit mode, select Custom Widgets from the side bar and follow the prompts to register a new Custom Widget. Call this widget "Product: Build" or something similar. 
-
-For more information on establishing a new Custom Widget in the developer portal, please see the [documentation](https://learn.microsoft.com/en-us/azure/api-management/developer-portal-extend-custom-functionality#create-widget).
-
-### Install Dependencies
-
-* Install [Node JS Runtime](https://nodejs.org/en/)
-* Install [Python](https://www.python.org/downloads/) (for backend Azure Function)
-* Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
-
 ### Establish Environment Variables
+
+Visit the Azure Portal to gather the following environment variable values and execute the script below.
 
 ```powershell
 $env:APIM_ID = "<APIM Resource Id>";
@@ -54,6 +48,12 @@ $env:APIM_ENDPOINT = "https://management.azure.com";
 $env:APIM_DEV_PORTAL_LOCALHOST_PORT = 3000;
 ```
 
+### Provision Custom Widget
+
+Log into the Azure portal with a user that has at least Contributor permissions on the APIM resource. On the APIM resource, under Developer Portal, select Portal Overview > Developer portal. This launches the Developer Portal in edit/management mode. Once in edit mode, select Custom Widgets from the side bar and follow the prompts to register a new Custom Widget. Call this widget "Product-Build". Apply this widget to a page in the Developer Portal within a full-width Section. 
+
+For more information on establishing a new Custom Widget in the developer portal, please see the [documentation](https://learn.microsoft.com/en-us/azure/api-management/developer-portal-extend-custom-functionality#create-widget).
+
 ## Local Development
 
 ### Widget
@@ -64,6 +64,18 @@ cd widgets/product-build/src/widget
 npm install
 npm start
 ```
+
+Browse to the APIM Developer Portal page where the custom widget was added. Append the query string __?MS_APIM_CW_localhost_port=3000__. This should pull in the local custom widget application running on http://localhost:3000/.
+
+NOTE: Initial setup of the custom widget requires establishing values for some required custom properties. While viewing the widget in the developer portal, click on the widget view and select __Edit Widget__. Supply values for connecting to other Azure Resources via the Custom Properties.
+
+| Property  | Description |
+| --------- | ----------- |
+| Product Name Placeholder | Placeholder text in the Product Name input when creating new Product |
+| Product Desc Placeholder | Placeholder text in the Product Description input when creating new Product |
+| API Endpoint | API endpoint for the Azure Function app |
+| Base Product Tag | API Tag name(s) of tags assigned to the base/discovery Products  |
+| Enable Debug Mode | Flag to output session information to browser's console window |
 
 ### API
 
@@ -97,9 +109,16 @@ async function getAccessToken(managementApiEndpoint) {
     return `Bearer ${token}`;
 }
 ```
+
+NOTE: If troubleshooting errors related to CORS access denying requests from the APIM developer portal, take note of the source blob storage SAS domain used by the APIM developer portal to run custom widgets. Supply this unique domain as a CORS access value in the Azure Function CORS settings. Alternatively, supply "*" to allow all requests (if using the supplied Terraform scripts, set variable __cors_allow_all_origins__ to true).
+
 ### Deploy Widget Via CI/CD
 
 Coming Soon - TODO
+
+### Troubleshooting
+
+
 
 ### Trademarks
 

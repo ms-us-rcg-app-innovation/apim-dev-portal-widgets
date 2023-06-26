@@ -22,9 +22,9 @@ resource "azurerm_api_management_logger" "example" {
   name                = "${var.apim_name}-logger"
   api_management_name = azurerm_api_management.main.name
   resource_group_name = var.resource_group_name
-  resource_id         = azurerm_application_insights.example.id
+  resource_id         = azurerm_application_insights.logs.id
 
   application_insights {
-    instrumentation_key = azurerm_application_insights.example.instrumentation_key
+    instrumentation_key = azurerm_application_insights.logs.instrumentation_key
   }
 }
